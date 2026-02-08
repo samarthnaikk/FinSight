@@ -65,7 +65,12 @@ export default function SignUpDialog({ isOpen, onClose }) {
     
     if (validateForm()) {
       // Form is valid - in a real app, this would call an API
-      console.log('Sign up form submitted:', formData)
+      console.log('Sign up form submitted:', {
+        name: formData.name,
+        username: formData.username,
+        email: formData.email
+        // Passwords are intentionally not logged for security
+      })
       alert('Sign up successful! (Frontend only - no backend integration)')
       handleClose()
     }

@@ -3,8 +3,10 @@ import React, { useEffect } from 'react'
 export default function Modal({ isOpen, onClose, title, children }) {
   // Close modal on Escape key press
   useEffect(() => {
+    if (!isOpen) return
+    
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape') {
         onClose()
       }
     }

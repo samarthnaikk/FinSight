@@ -44,7 +44,10 @@ export default function SignInDialog({ isOpen, onClose }) {
     
     if (validateForm()) {
       // Form is valid - in a real app, this would call an API
-      console.log('Sign in form submitted:', formData)
+      console.log('Sign in form submitted:', {
+        usernameOrEmail: formData.usernameOrEmail
+        // Password is intentionally not logged for security
+      })
       alert('Sign in successful! (Frontend only - no backend integration)')
       handleClose()
     }
