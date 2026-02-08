@@ -57,14 +57,14 @@ body{
   align-items:center;
 }
 .capsule-btn{
-  padding:10px 24px;
+  padding:10px 28px;
   background:linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
   color:#000;
   border:none;
   border-radius:50px;
   font-family:'Inter', sans-serif;
-  font-weight:600;
-  font-size:12px;
+  font-weight:700;
+  font-size:18px;
   letter-spacing:0.5px;
   cursor:pointer;
   box-shadow:0 2px 8px rgba(0,0,0,0.15);
