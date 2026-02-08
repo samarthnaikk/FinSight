@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.venv/
+
+# React
+node_modules/
+build/
+dist/
+*.log
+
+# Docker
+*.env
+.env*
+
+# VS Code
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Misc
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Ignore coverage and test results
+coverage/
+*.coverage
+*.egg-info/
+
+# Ignore local settings
+local_settings.py
+
+# Ignore secrets
+secrets/
