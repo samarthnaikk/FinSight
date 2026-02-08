@@ -2,14 +2,17 @@ import React from 'react'
 
 export default function Header() {
   return (
-    <header className="header">
-      <div className="brand">FinSight <span className="badge">AI</span></div>
-      <nav className="nav">
-        <a href="#">Dashboard</a>
-        <a href="#">Calls</a>
-        <a href="#">Documents</a>
-        <a href="#">Integrations</a>
-      </nav>
+    <header className="header minimal">
+      <div className="left">
+        <div className="logo" aria-hidden>🔷</div>
+        <div className="project-name">FinSight</div>
+      </div>
+
+      <div className="right">
+        <a href="#" className="link">Sign In</a>
+        <a href="#" className="cta">Sign Up</a>
+        <a href="#" className="link">Help</a>
+      </div>
     </header>
   )
 }
