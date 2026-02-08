@@ -92,14 +92,15 @@ body{
 .hero-title {
   font-family: 'Playfair Display', serif;
   font-weight: 800;
-  font-size: 110px;
-  color: #fff;
+  font-size: 160px;
+  color: #FFFFFF;
   margin: 0 0 36px 0;
-  line-height: 1.1;
-  letter-spacing: -1px;
+  line-height: 1.05;
+  letter-spacing: -2px;
 }
 .hero-title.larger {
-  font-size: 120px;
+  font-size: 180px;
+  color: #FFFFFF;
 }
 .hero-tagline {
   text-align: right;
