@@ -16,6 +16,10 @@ import DataIngestPage from './pages/DataIngestPage'
 function LandingPage() {
   return (
     <div className="app">
+      <video className="bg-video" autoPlay muted loop>
+        <source src="/bg_vid.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
       <Header />
       <main className="main-content">
         <div className="hero-content">
