@@ -83,10 +83,13 @@ echo "======================================"
 # Test backend health
 echo ""
 echo "Testing backend (http://localhost:8000)..."
-if curl -s -f http://localhost:8000/api/auth/me/ > /dev/null 2>&1; then
+# Note: /api/auth/me/ requires authentication, so we test if the service responds
+if curl -s http://localhost:8000/api/auth/me/ 2>&1 | grep -q "detail\|error\|Unauthorized"; then
+    echo "✓ Backend is responding (authentication required as expected)"
+elif curl -s http://localhost:8000 > /dev/null 2>&1; then
     echo "✓ Backend is responding"
 else
-    echo "⚠ Backend is not responding (may need authentication)"
+    echo "❌ Backend is not responding"
 fi
 
 # Test models health

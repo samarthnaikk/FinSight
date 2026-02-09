@@ -30,6 +30,7 @@ services:
     container_name: finsight-backend
     environment:
       # Django configuration
+      # WARNING: Change secret key for production! This default is for development only.
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-change-this-in-production}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
       # Database configuration
@@ -48,7 +49,7 @@ services:
       # Google OAuth configuration (optional)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       # Field encryption key
-      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-default-insecure-encryption-key-change-this}
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-rFGh6XAnqhNrIqUCQGz5obDcuIYLs7W5CfHOqZOpOwc=}
     ports:
       - "8000:8000"
     depends_on:

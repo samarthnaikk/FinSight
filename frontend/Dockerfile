@@ -16,5 +16,7 @@ COPY . .
 # Expose port
 EXPOSE 5173
 
+# Note: This uses Vite dev server for DEVELOPMENT only.
+# For production, build static assets and serve via nginx or similar.
 # Run Vite development server
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -25,5 +25,10 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
+# Note: Database migrations must be run manually after container startup:
+# docker compose exec backend python manage.py migrate
+# For automated migrations, consider using an entrypoint script
+
 # Run Django development server
+# WARNING: This is for DEVELOPMENT only. For production, use Gunicorn or uWSGI
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

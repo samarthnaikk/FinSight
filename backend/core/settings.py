@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("DJANGO_SECRET_KEY", default="django-insecure-change-this-in-production")
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
-FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="default-insecure-encryption-key-change-this")
+FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="rFGh6XAnqhNrIqUCQGz5obDcuIYLs7W5CfHOqZOpOwc=")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
