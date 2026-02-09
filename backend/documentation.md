@@ -643,8 +643,14 @@ return str(random.randint(100000, 999999))
 
 #### Database
 
-- **Engine:** SQLite3
-- **Location:** `backend/db.sqlite3`
+- **Engine:** PostgreSQL
+- **Configuration:** Via environment variables in `.env`
+- **Default Database:** `finsight_db`
+- **Default User:** `finsight_user`
+- **Connection:** Configurable via `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- **Docker Setup:** PostgreSQL runs in a Docker container (see `docker-compose.yml`)
+
+For detailed setup instructions, see [POSTGRESQL_SETUP.md](../POSTGRESQL_SETUP.md)
 
 #### Email Configuration
 
@@ -840,7 +846,7 @@ urlpatterns = [
 3. **Token Expiration:** Access tokens expire after 15 minutes; refresh tokens after 1 day
 4. **Security:** Passwords are hashed using Django's default password hasher
 5. **CORS:** Currently allows all origins (should be restricted in production)
-6. **Database:** Using SQLite for development (consider PostgreSQL for production)
+6. **Database:** Using PostgreSQL with Docker. All configuration is via environment variables for easy deployment
 7. **Email:** Using Gmail SMTP (credentials exposed in settings.py - move to environment variables)
 8. **Admin Panel:** Not currently configured in URLs
 
