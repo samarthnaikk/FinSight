@@ -28,11 +28,13 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=100)
     username = models.CharField(max_length=50, unique=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
 
     is_email_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)
+    otp_resend_count = models.PositiveIntegerField(default=0)
+    otp_last_sent_at = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -40,6 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
+    EMAIL_FIELD = "email"
 
     objects = UserManager()   
 
