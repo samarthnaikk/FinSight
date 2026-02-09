@@ -23,8 +23,10 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('accessToken');
       if (token) {
         try {
-          const userData = await backendAPI.getMe();
-          setUser(userData);
+          const response = await backendAPI.getMe();
+          if (response.success && response.data) {
+            setUser(response.data);
+          }
         } catch (error) {
           console.error('Failed to fetch user:', error);
           // Clear invalid tokens
@@ -43,14 +45,19 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     const response = await backendAPI.login(credentials);
     
-    if (response.data && response.data.access && response.data.refresh) {
-      const { access, refresh, user: userData } = response.data;
+    if (response.success && response.data && response.data.access && response.data.refresh) {
+      const { access, refresh } = response.data;
       
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
       setAccessToken(access);
       setRefreshToken(refresh);
-      setUser(userData);
+      
+      // Fetch user data
+      const userResponse = await backendAPI.getMe();
+      if (userResponse.success && userResponse.data) {
+        setUser(userResponse.data);
+      }
       
       return response;
     }

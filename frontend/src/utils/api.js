@@ -12,21 +12,23 @@ const getAuthToken = () => {
 const handleResponse = async (response) => {
   const contentType = response.headers.get('content-type');
   
-  if (!response.ok) {
-    let errorMessage = 'An error occurred';
+  if (contentType && contentType.includes('application/json')) {
+    const jsonData = await response.json();
     
-    if (contentType && contentType.includes('application/json')) {
-      const errorData = await response.json();
-      errorMessage = errorData.error || errorData.detail || errorData.message || errorMessage;
-    } else {
-      errorMessage = await response.text();
+    if (!response.ok) {
+      // Handle error response
+      const errorMessage = jsonData.error?.message || jsonData.detail || 'An error occurred';
+      throw new Error(errorMessage);
     }
     
-    throw new Error(errorMessage);
+    // Return the parsed JSON for successful responses
+    return jsonData;
   }
   
-  if (contentType && contentType.includes('application/json')) {
-    return response.json();
+  // For non-JSON responses
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'An error occurred');
   }
   
   return response.text();
@@ -52,7 +54,10 @@ export const backendAPI = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify({
+        identifier: credentials.email,
+        password: credentials.password,
+      }),
     });
     return handleResponse(response);
   },
