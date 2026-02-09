@@ -10,6 +10,7 @@ export default function ChatbotPage() {
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -23,6 +24,7 @@ export default function ChatbotPage() {
   // Load conversation history on mount
   useEffect(() => {
     const loadHistory = async () => {
+      setIsLoadingHistory(true)
       try {
         const response = await backendAPI.getChatHistory()
         if (response.success && response.data?.messages) {
@@ -30,6 +32,8 @@ export default function ChatbotPage() {
         }
       } catch (error) {
         console.error('Failed to load chat history:', error)
+      } finally {
+        setIsLoadingHistory(false)
       }
     }
     loadHistory()
@@ -89,12 +93,16 @@ export default function ChatbotPage() {
       <main className="chatbot-main">
         <div className="chat-container">
           <div className="chat-messages">
-            {messages.length === 0 && (
+            {isLoadingHistory ? (
+              <div className="welcome-message">
+                <p>Loading conversation history...</p>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="welcome-message">
                 <h3>Welcome to FinSight AI Chatbot</h3>
                 <p>Start a conversation to get financial insights</p>
               </div>
-            )}
+            ) : null}
             
             {messages.map((msg, idx) => (
               <div key={idx} className={`message message-${msg.role} message-fade-in`}>

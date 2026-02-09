@@ -70,7 +70,8 @@ class ChatbotService:
             # Create or reuse thread
             try:
                 thread = await self.client.get_thread(thread_id)
-            except:
+            except Exception:
+                # Thread doesn't exist, create a new one
                 thread = await self.client.create_thread(assistant.assistant_id)
             
             # Build context from conversation history
@@ -109,15 +110,24 @@ class ChatbotService:
     ) -> str:
         """
         Synchronous wrapper for generate_response.
+        Uses asyncio.run() to execute the async function.
         """
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            return loop.run_until_complete(
+        # Use asyncio.run() which properly handles the event loop
+        import sys
+        if sys.version_info >= (3, 7):
+            return asyncio.run(
                 self.generate_response(user_id, message, conversation_history)
             )
-        finally:
-            loop.close()
+        else:
+            # Fallback for older Python versions
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(
+                    self.generate_response(user_id, message, conversation_history)
+                )
+            finally:
+                loop.close()
 
 
 # Singleton instance
