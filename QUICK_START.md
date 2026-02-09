@@ -1,27 +1,6 @@
 # FinSight Quick Start Guide
 
-## 🚀 Get Started in 4 Steps
-
-### Step 0: Start PostgreSQL Database
-
-```bash
-# Start PostgreSQL container
-docker compose up -d
-
-# Verify it's running
-docker compose ps
-```
-
-**First time setup:**
-```bash
-# Configure backend environment
-cd backend
-cp .env.example .env
-# Edit .env with your configuration (database defaults work with docker-compose.yml)
-
-# Run database migrations
-python manage.py migrate
-```
+## 🚀 Get Started in 3 Steps
 
 ### Step 1: Start the Services
 
@@ -76,20 +55,6 @@ Once signed in, you can access:
 
 ## 🔧 Troubleshooting
 
-### Database Connection Issues?
-```bash
-# Check if PostgreSQL is running
-docker compose ps
-
-# Check logs
-docker compose logs postgres
-
-# Verify connection
-docker compose exec postgres psql -U finsight_user -d finsight_db -c "\dt"
-```
-
-For detailed PostgreSQL troubleshooting, see [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md).
-
 ### Services Not Running?
 Make sure all three services are started and running on correct ports.
 
@@ -106,7 +71,6 @@ Verify all services are on their designated ports:
 
 ## 📚 More Information
 
-- **PostgreSQL Setup**: See `POSTGRESQL_SETUP.md`
 - **Full Integration Guide**: See `INTEGRATION_GUIDE.md`
 - **API Documentation**: See `documentation.md`
 - **Complete Report**: See `COMPLETION_REPORT.md`
@@ -117,4 +81,4 @@ This integration uses JWT authentication with tokens stored in localStorage.
 
 ---
 
-**Need Help?** Check `INTEGRATION_GUIDE.md` for detailed documentation or `POSTGRESQL_SETUP.md` for database issues.
+**Need Help?** Check `INTEGRATION_GUIDE.md` for detailed documentation
