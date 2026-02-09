@@ -45,3 +45,8 @@ local_settings.py
 
 # Ignore secrets
 secrets/
+
+# Database files
+*.db
+*.sqlite3
+postgres_data/
