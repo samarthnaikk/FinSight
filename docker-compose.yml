@@ -11,6 +11,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-finsight_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finsight_password}
     ports:
+      # Maps host port to container port 5432
+      # POSTGRES_PORT only affects the host-side port mapping
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data

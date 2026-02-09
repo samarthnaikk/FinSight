@@ -111,12 +111,12 @@ docker compose down -v
 
 To use different database credentials:
 
-1. Update `docker compose.yml` environment variables
+1. Update `docker-compose.yml` environment variables
 2. Update `backend/.env` to match
 3. Restart the PostgreSQL container
 
 ```yaml
-# docker compose.yml
+# docker-compose.yml
 environment:
   POSTGRES_DB: my_custom_db
   POSTGRES_USER: my_user
@@ -169,7 +169,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO finsight_user;
 
 For production:
 
-1. **Change default credentials** in both `docker compose.yml` and `.env`
+1. **Change default credentials** in both `docker-compose.yml` and `.env`
 2. Use strong, randomly generated passwords
 3. Consider using environment-specific configuration
 4. Set `DJANGO_DEBUG=False`
