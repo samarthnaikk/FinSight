@@ -3,3 +3,6 @@ djangorestframework
 django-cors-headers
 djangorestframework-simplejwt
 python-decouple
+requests
+google-auth
+google-auth-oauthlib

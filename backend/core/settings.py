@@ -24,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("DJANGO_SECRET_KEY")
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
+GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 

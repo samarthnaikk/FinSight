@@ -46,6 +46,7 @@ All authentication routes are prefixed with `/api/auth/`
 | **POST**    | `/api/auth/verify-otp/`    | `VerifyOTPView`    | No                      | Verify OTP to activate email verification    |
 | **POST**    | `/api/auth/logout/`        | `LogoutView`       | Yes (JWT)               | Logout and blacklist refresh token           |
 | **POST**    | `/api/auth/token/refresh/` | `TokenRefreshView` | No                      | Refresh JWT access token using refresh token |
+| **POST**    | `/api/auth/google/`        | `GoogleAuthView`   | No                      | Authenticate with Google OAuth token         |
 
 ---
 
@@ -498,6 +499,62 @@ Authorization: Bearer <access_token>
 
 ---
 
+### `GoogleAuthView`
+
+**Location:** `backend/accounts/views.py`  
+**Base Class:** `APIView`  
+**Permission:** `AllowAny` (public access)
+
+#### POST `/api/auth/google/`
+
+**Purpose:** Authenticate user using Google OAuth token and return JWT tokens
+
+**Request Body:**
+
+```json
+{
+  "token": "string (required, Google OAuth ID token)"
+}
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "access": "eyJhbGc...",
+  "refresh": "eyJhbGc..."
+}
+```
+
+**Error Responses:**
+
+**400 BAD REQUEST:**
+
+```json
+{
+  "error": "Token is required"
+}
+```
+
+**401 UNAUTHORIZED:**
+
+```json
+{
+  "error": "Invalid token"
+}
+```
+
+**Implementation Details:**
+
+- Verifies Google OAuth ID token using `google.oauth2.id_token`
+- Extracts user information (email, name) from verified token
+- Creates new user if email doesn't exist, or retrieves existing user
+- Automatically sets `is_email_verified=True` for Google-authenticated users
+- Returns both access and refresh JWT tokens
+- Requires valid Google OAuth Client ID configured in settings
+
+---
+
 ## Serializers
 
 ### `RegisterSerializer`
@@ -755,6 +812,7 @@ urlpatterns = [
     path("verify-otp/", VerifyOTPView.as_view()),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("google/", GoogleAuthView.as_view(), name="google-auth"),
 ]
 ```
 
@@ -768,6 +826,10 @@ urlpatterns = [
 - `djangorestframework`
 - `django-cors-headers`
 - `djangorestframework-simplejwt`
+- `python-decouple`
+- `requests`
+- `google-auth`
+- `google-auth-oauthlib`
 
 ---
 

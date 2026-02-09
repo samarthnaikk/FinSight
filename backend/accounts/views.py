@@ -5,11 +5,76 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import timedelta
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from django.conf import settings
 
 from .utils import generate_otp
 from .models import User
 from .serializers import RegisterSerializer
 from .responses import success_response, error_response
+
+class GoogleAuthView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get("token")
+
+        if not token:
+            return error_response(
+                code="TOKEN_REQUIRED",
+                message="Google ID token is required",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                token,
+                google_requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError:
+            return error_response(
+                code="INVALID_GOOGLE_TOKEN",
+                message="Invalid Google token",
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        email = idinfo.get("email")
+        name = idinfo.get("name")
+
+        if not email:
+            return error_response(
+                code="EMAIL_NOT_FOUND",
+                message="Email not found in Google account",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 🔐 Create or fetch user
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": email.split("@")[0],
+                "name": name or "",
+                "is_email_verified": True,
+            }
+        )
+
+        # If existing user but email not verified
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            user.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        return success_response(
+            data={
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "is_new_user": created
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class RegisterView(APIView):
