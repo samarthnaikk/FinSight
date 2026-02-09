@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,6 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("DJANGO_SECRET_KEY")
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID")
+FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     'accounts',
+    'api',
 ]
 
 MIDDLEWARE = [
