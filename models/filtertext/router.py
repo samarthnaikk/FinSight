@@ -1,19 +1,18 @@
 """
 API routes for transcript post-processing.
-
-Provides endpoints for:
-1. Processing existing transcripts through PII filtering and structured output generation
-2. Loading and processing transcript files
 """
 
 import os
 import re
+import traceback
 from pathlib import Path
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
+
+# Ensure we import the updated service
 from .service import TranscriptProcessingService
 
 # Load environment variables
@@ -26,7 +25,8 @@ router = APIRouter(prefix="/filtertext", tags=["transcript-processing"])
 PROCESSED_OUTPUTS_DIR = Path(__file__).parent / "processed_outputs"
 PROCESSED_OUTPUTS_DIR.mkdir(exist_ok=True)
 
-# Directory where transcriptions are stored (from audiotext module)
+# Directory where transcriptions are stored (assuming standard project structure)
+# Adjust this path if your audiotext folder is located elsewhere relative to filtertext
 TRANSCRIPTIONS_DIR = Path(__file__).parent.parent / "audiotext" / "transcriptions"
 
 
@@ -41,10 +41,9 @@ class TranscriptFileProcessRequest(BaseModel):
     transcript_filename: str
 
 
-def get_processing_service() -> TranscriptProcessingService:
+def get_processing_service():
     """
     Dependency injection for transcript processing service.
-    Creates a new service instance with API key from environment.
     """
     api_key = os.getenv("BACKBOARD_API_KEY")
     if not api_key:
@@ -56,13 +55,8 @@ def get_processing_service() -> TranscriptProcessingService:
 
 
 def sanitize_filename(filename: str) -> str:
-    """
-    Sanitize filename to prevent path traversal attacks.
-    Removes directory separators and keeps only safe characters.
-    """
-    # Get just the filename without path
+    """Sanitize filename to prevent path traversal attacks."""
     base_name = Path(filename).name
-    # Remove any characters that aren't alphanumeric, dash, underscore, or dot
     sanitized = re.sub(r'[^a-zA-Z0-9._-]', '_', base_name)
     return sanitized
 
@@ -73,23 +67,13 @@ async def process_transcript_text(
     service: TranscriptProcessingService = Depends(get_processing_service)
 ):
     """
-    Process transcript text through the complete pipeline:
-    1. Remove PII using local model
-    2. Generate structured output using Gemini-2.5-pro via Backboard
-    3. Save both outputs
-    
-    Args:
-        request: TranscriptProcessRequest with text and optional filename
-        
-    Returns:
-        JSON response with processing results and file paths
+    Process transcript text through the complete pipeline.
     """
     try:
-        # Sanitize filename
         safe_filename = sanitize_filename(request.filename)
         
-        # Process the transcript
-        result = service.process_transcript(
+        # CHANGED: Added 'await' because service methods are now async
+        result = await service.process_transcript(
             transcript_text=request.text,
             base_filename=safe_filename,
             output_dir=PROCESSED_OUTPUTS_DIR
@@ -99,18 +83,19 @@ async def process_transcript_text(
             status_code=200,
             content={
                 "message": "Transcript processed successfully",
-                "pii_cleaned_file": result["pii_cleaned_path"],
-                "structured_output_file": result["structured_output_path"],
-                "structured_output": result["structured_output"]
+                "files": {
+                    "pii_cleaned": result["pii_cleaned_path"],
+                    "structured_output": result["structured_output_path"]
+                },
+                "data": result["structured_output"]
             }
         )
         
     except Exception as e:
-        import traceback
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"An error occurred during transcript processing: {str(e)}"
+            detail=f"An error occurred during processing: {str(e)}"
         )
 
 
@@ -121,40 +106,32 @@ async def process_transcript_file(
 ):
     """
     Process an existing transcript file from the audiotext/transcriptions directory.
-    
-    This endpoint:
-    1. Loads the specified transcript file
-    2. Removes PII using local model
-    3. Generates structured output using Gemini-2.5-pro via Backboard
-    4. Saves both outputs
-    
-    Args:
-        request: TranscriptFileProcessRequest with transcript filename
-        
-    Returns:
-        JSON response with processing results and file paths
     """
     try:
-        # Sanitize and validate filename
         safe_filename = sanitize_filename(request.transcript_filename)
         transcript_path = TRANSCRIPTIONS_DIR / safe_filename
         
-        # Check if file exists
         if not transcript_path.exists():
-            raise HTTPException(
-                status_code=404,
-                detail=f"Transcript file not found: {safe_filename}"
-            )
+            # Try looking in the local directory if not found in ../audiotext/transcriptions
+            # This is helpful during testing
+            local_path = Path(safe_filename)
+            if local_path.exists():
+                transcript_path = local_path
+            else:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Transcript file not found at: {transcript_path}"
+                )
         
         # Read the transcript
         with open(transcript_path, 'r', encoding='utf-8') as f:
             transcript_text = f.read()
         
-        # Generate base filename for outputs (remove _transcription.txt suffix if present)
+        # Generate base filename
         base_filename = safe_filename.replace('_transcription.txt', '').replace('.txt', '')
         
-        # Process the transcript
-        result = service.process_transcript(
+        # CHANGED: Added 'await' here as well
+        result = await service.process_transcript(
             transcript_text=transcript_text,
             base_filename=base_filename,
             output_dir=PROCESSED_OUTPUTS_DIR
@@ -163,44 +140,35 @@ async def process_transcript_file(
         return JSONResponse(
             status_code=200,
             content={
-                "message": "Transcript file processed successfully",
-                "source_file": str(transcript_path),
-                "pii_cleaned_file": result["pii_cleaned_path"],
-                "structured_output_file": result["structured_output_path"],
-                "structured_output": result["structured_output"]
+                "message": "File processed successfully",
+                "source": str(transcript_path),
+                "files": {
+                    "pii_cleaned": result["pii_cleaned_path"],
+                    "structured_output": result["structured_output_path"]
+                },
+                "data": result["structured_output"]
             }
         )
         
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"An error occurred during transcript file processing: {str(e)}"
+            detail=f"An error occurred during file processing: {str(e)}"
         )
 
 
 @router.get("/status")
 async def get_processing_status():
-    """
-    Get status of the transcript processing service.
-    
-    Returns information about available endpoints and configuration.
-    """
-    backboard_configured = bool(os.getenv("BACKBOARD_API_KEY"))
-    
+    """Get status of the transcript processing service."""
     return {
         "service": "Transcript Post-Processing",
         "status": "operational",
-        "backboard_api_configured": backboard_configured,
-        "endpoints": {
-            "process": "/filtertext/process - Process transcript text directly",
-            "process_file": "/filtertext/process-file - Process existing transcript file"
-        },
-        "pipeline": [
-            "1. PII Removal (Local Model: Phi-3-mini)",
-            "2. Structured Output Generation (Gemini-2.5-pro via Backboard)"
-        ]
+        "configuration": {
+            "backboard_api": bool(os.getenv("BACKBOARD_API_KEY")),
+            "output_dir": str(PROCESSED_OUTPUTS_DIR),
+            "input_dir": str(TRANSCRIPTIONS_DIR)
+        }
     }
