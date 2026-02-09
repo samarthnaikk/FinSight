@@ -1,1 +1,14 @@
-#will be used for db
+# PostgreSQL Dockerfile for FinSight
+# This container provides a PostgreSQL database with automatic initialization
+
+FROM postgres:16-alpine
+
+# Copy initialization script
+COPY init-db.sql /docker-entrypoint-initdb.d/
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# The official postgres image already handles initialization
+# Scripts in /docker-entrypoint-initdb.d/ are executed on first run
+# Database credentials are configured via environment variables in docker-compose.yml

@@ -1,0 +1,28 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    container_name: finsight-postgres
+    environment:
+      # These can be overridden by creating a .env file in the root directory
+      # For production, ALWAYS change these default values
+      POSTGRES_DB: ${POSTGRES_DB:-finsight_db}
+      POSTGRES_USER: ${POSTGRES_USER:-finsight_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finsight_password}
+    ports:
+      # Maps host port to container port 5432
+      # POSTGRES_PORT only affects the host-side port mapping
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finsight_user} -d ${POSTGRES_DB:-finsight_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

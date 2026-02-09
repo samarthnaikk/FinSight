@@ -86,10 +86,28 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# PostgreSQL Configuration
+# The database settings can be configured via environment variables
+# Default values are provided for development with Docker setup
+# For production, all values should be explicitly set via environment variables
+
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.postgresql")
+DB_NAME = config("DB_NAME", default="finsight_db")
+DB_USER = config("DB_USER", default="finsight_user")
+# Password should be set via environment variable for production
+# Development default matches docker-compose.yml
+DB_PASSWORD = config("DB_PASSWORD", default="finsight_password")
+DB_HOST = config("DB_HOST", default="localhost")
+DB_PORT = config("DB_PORT", default="5432")
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': DB_ENGINE,
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
