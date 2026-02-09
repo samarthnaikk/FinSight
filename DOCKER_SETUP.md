@@ -1,6 +1,6 @@
 # Docker Setup for FinSight
 
-This document describes how to run FinSight using Docker Compose.
+This document describes how to run the complete FinSight stack using Docker Compose, including PostgreSQL database, Django backend, FastAPI models service, and React frontend.
 
 ## Prerequisites
 

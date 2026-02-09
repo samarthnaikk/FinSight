@@ -13,7 +13,7 @@ This document summarizes the Docker implementation for the FinSight application,
 ### 2. Docker Compose Configuration
 - ✅ Single `docker-compose.yml` at repository root
 - ✅ All four services configured:
-  - PostgreSQL (existing)
+  - PostgreSQL (database)
   - Backend (Django)
   - Models (FastAPI)
   - Frontend (React/Vite)
