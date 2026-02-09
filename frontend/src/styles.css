@@ -111,13 +111,15 @@ body{
   display: flex;
   flex-direction: column;
   flex: 1;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 .hero-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex: 1;
-  margin-top: -350px;
+  margin-top: -450px;
 }
 .hero-right-content {
   display: flex;
@@ -204,8 +206,10 @@ body{
 .hero-buttons {
   display: flex;
   gap: 40px;
-  justify-content: flex-start;
-  margin-top: 60px;
+  justify-content: flex-end;
+  margin-top: 0;
+  margin-bottom: 10px;
+  margin-right: -80px;
 }
 
 .hero-btn {
