@@ -16,7 +16,7 @@ class ChatbotService:
         """Initialize the Backboard client."""
         self.backboard_api_key = config("BACKBOARD_API_KEY", default=None)
         self.provider = "google"
-        self.model = "gemini-flash-2.5"
+        self.model = "gemini-2.5-flash"
         
         if not self.backboard_api_key:
             raise ValueError("BACKBOARD_API_KEY not configured in environment")
