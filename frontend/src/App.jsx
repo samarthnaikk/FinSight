@@ -20,18 +20,20 @@ function LandingPage() {
       <main className="main-content">
         <div className="hero-content">
           <div className="hero-left">
-            <div className="hero-tagline larger">
-              <p>an end-to-end financial intelligence platform that transforms</p>
-              <p>unstructured voice calls and complex financial documents into</p>
-              <p>structured, actionable insights.</p>
-            </div>
             <div className="hero-buttons">
               <Link to="/signup" className="hero-btn get-started-btn">GET STARTED</Link>
               <Link to="/signin" className="hero-btn hero-sign-in-btn">SIGN IN</Link>
             </div>
           </div>
           <div className="hero-right">
-            <h1 className="hero-title larger">FinSight AI</h1>
+            <div className="hero-right-content">
+              <h1 className="hero-title larger">FinSight AI</h1>
+              <div className="hero-tagline larger">
+                <p>an end-to-end financial intelligence platform that transforms</p>
+                <p>unstructured voice calls and complex financial documents into</p>
+                <p>structured, actionable insights.</p>
+              </div>
+            </div>
           </div>
         </div>
       </main>
