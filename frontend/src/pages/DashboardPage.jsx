@@ -27,25 +27,25 @@ export default function DashboardPage() {
 
         <div className="features-grid">
           <Link to="/chatbot" className="feature-card">
-            <div className="feature-icon">💬</div>
+            <div className="feature-icon">AI</div>
             <h3>Chatbot</h3>
             <p>Interact with the AI chatbot for financial insights</p>
           </Link>
 
           <Link to="/transcribe" className="feature-card">
-            <div className="feature-icon">🎤</div>
+            <div className="feature-icon">MIC</div>
             <h3>Audio Transcription</h3>
             <p>Transcribe audio files to text using AI</p>
           </Link>
 
           <Link to="/process-text" className="feature-card">
-            <div className="feature-icon">📄</div>
+            <div className="feature-icon">TXT</div>
             <h3>Text Processing</h3>
             <p>Process and analyze transcripts with PII filtering</p>
           </Link>
 
           <Link to="/data-ingest" className="feature-card">
-            <div className="feature-icon">📊</div>
+            <div className="feature-icon">DB</div>
             <h3>Data Ingestion</h3>
             <p>Ingest confidential and non-confidential data</p>
           </Link>
