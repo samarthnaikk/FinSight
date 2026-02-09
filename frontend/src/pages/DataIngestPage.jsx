@@ -123,7 +123,7 @@ export default function DataIngestPage() {
             <div className="result-container">
               <h3>Ingestion Result</h3>
               <div className="result-box success">
-                <p>{result.data?.message || 'Data ingested successfully'}</p>
+                <p>{result.success ? 'Data ingested successfully' : 'Ingestion failed'}</p>
               </div>
             </div>
           )}

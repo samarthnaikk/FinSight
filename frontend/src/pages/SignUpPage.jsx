@@ -86,8 +86,7 @@ export default function SignUpPage() {
         // Navigate to OTP verification page
         navigate('/verify-otp', { 
           state: { 
-            email: formData.email,
-            username: formData.username 
+            email: formData.email
           } 
         })
       } catch (error) {

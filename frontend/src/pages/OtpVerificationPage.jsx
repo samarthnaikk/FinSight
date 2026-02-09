@@ -6,7 +6,6 @@ export default function OtpVerificationPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const email = location.state?.email || ''
-  const username = location.state?.username || ''
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
