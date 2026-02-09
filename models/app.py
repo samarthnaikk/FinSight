@@ -3,14 +3,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from audiotext.router import router as transcription_router
+from filtertext.router import router as filtertext_router
 
 # Load environment variables
 load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="FinSight Audio Transcription API",
-    description="API for transcribing audio files using Groq Whisper model",
+    title="FinSight Audio Transcription and Processing API",
+    description="API for transcribing audio files and processing transcripts with PII filtering and structured output generation",
     version="1.0.0"
 )
 
@@ -28,16 +29,20 @@ app.add_middleware(
 
 # Mount routers
 app.include_router(transcription_router)
+app.include_router(filtertext_router)
 
 
 @app.get("/")
 async def root():
     """Root endpoint providing API information."""
     return {
-        "message": "FinSight Audio Transcription API",
+        "message": "FinSight Audio Transcription and Processing API",
         "version": "1.0.0",
         "endpoints": {
-            "transcribe": "/transcribe"
+            "transcribe": "/transcribe",
+            "process_transcript": "/filtertext/process",
+            "process_transcript_file": "/filtertext/process-file",
+            "processing_status": "/filtertext/status"
         }
     }
 

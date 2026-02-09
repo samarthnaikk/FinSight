@@ -4,3 +4,6 @@ python-multipart==0.0.22
 groq==0.4.2
 python-dotenv==1.0.0
 requests==2.31.0
+transformers==4.48.0
+torch==2.6.0
+accelerate==0.25.0
