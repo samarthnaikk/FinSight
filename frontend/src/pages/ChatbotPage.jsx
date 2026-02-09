@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 import { useAuth } from '../context/AuthContext'
 import { backendAPI } from '../utils/api'
 
@@ -9,6 +10,35 @@ export default function ChatbotPage() {
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, isTyping])
+
+  // Load conversation history on mount
+  useEffect(() => {
+    const loadHistory = async () => {
+      setIsLoadingHistory(true)
+      try {
+        const response = await backendAPI.getChatHistory()
+        if (response.success && response.data?.messages) {
+          setMessages(response.data.messages)
+        }
+      } catch (error) {
+        console.error('Failed to load chat history:', error)
+      } finally {
+        setIsLoadingHistory(false)
+      }
+    }
+    loadHistory()
+  }, [])
 
   const handleLogout = async () => {
     await logout()
@@ -23,18 +53,24 @@ export default function ChatbotPage() {
     const userMessage = inputMessage.trim()
     
     // Add user message to chat
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    const newUserMessage = { role: 'user', content: userMessage }
+    setMessages(prev => [...prev, newUserMessage])
     setInputMessage('')
     setIsLoading(true)
+    setIsTyping(true)
 
     try {
       const response = await backendAPI.sendChatMessage(userMessage)
       
       // Add bot response
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: response.data?.message || 'Message stored successfully' 
-      }])
+      if (response.success && response.data?.message) {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: response.data.message 
+        }])
+      } else {
+        throw new Error(response.error || 'Failed to get response')
+      }
     } catch (error) {
       console.error('Chat error:', error)
       setMessages(prev => [...prev, { 
@@ -43,6 +79,7 @@ export default function ChatbotPage() {
       }])
     } finally {
       setIsLoading(false)
+      setIsTyping(false)
     }
   }
 
@@ -57,24 +94,39 @@ export default function ChatbotPage() {
       <main className="chatbot-main">
         <div className="chat-container">
           <div className="chat-messages">
-            {messages.length === 0 && (
+            {isLoadingHistory ? (
+              <div className="welcome-message">
+                <p>Loading conversation history...</p>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="welcome-message">
                 <h3>Welcome to FinSight AI Chatbot</h3>
                 <p>Start a conversation to get financial insights</p>
               </div>
-            )}
+            ) : null}
             
             {messages.map((msg, idx) => (
-              <div key={idx} className={`message message-${msg.role}`}>
-                <div className="message-content">{msg.content}</div>
+              <div key={idx} className={`message message-${msg.role} message-fade-in`}>
+                <div className="message-content">
+                  {msg.role === 'assistant' ? (
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  ) : (
+                    msg.content
+                  )}
+                </div>
               </div>
             ))}
             
-            {isLoading && (
-              <div className="message message-assistant">
-                <div className="message-content">Thinking...</div>
+            {isTyping && (
+              <div className="message message-assistant message-fade-in">
+                <div className="message-content typing-indicator">
+                  <span className="typing-dot"></span>
+                  <span className="typing-dot"></span>
+                  <span className="typing-dot"></span>
+                </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           <form onSubmit={handleSendMessage} className="chat-input-form">

@@ -146,6 +146,18 @@ export const backendAPI = {
     });
     return handleResponse(response);
   },
+
+  getChatHistory: async () => {
+    const token = getAuthToken();
+    const response = await fetch(`${BACKEND_URL}/api/chat/message/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return handleResponse(response);
+  },
 };
 
 // API client for models service endpoints
