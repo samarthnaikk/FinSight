@@ -323,9 +323,9 @@ body{
   align-items: center;
   gap: 8px;
   padding: 10px 24px;
-  border: 1px solid rgba(201, 169, 97, 0.7);
+  border: 1px solid rgba(192, 192, 192, 0.7);
   border-radius: 50px;
-  color: var(--old-gold);
+  color: var(--old-silver);
   text-decoration: none;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
@@ -338,9 +338,9 @@ body{
 }
 
 .back-to-home-btn:hover {
-  border-color: var(--light-gold);
-  background: rgba(201, 169, 97, 0.2);
-  color: var(--light-gold);
+  border-color: var(--light-silver);
+  background: rgba(192, 192, 192, 0.2);
+  color: var(--light-silver);
 }
 
 .back-arrow {
@@ -351,7 +351,7 @@ body{
   font-family: 'Playfair Display', serif;
   font-size: 64px;
   font-weight: 700;
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin: 80px 0 20px 0;
   letter-spacing: 4px;
   text-align: center;
@@ -363,15 +363,15 @@ body{
 .auth-title-divider {
   width: 180px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--old-gold), transparent);
+  background: linear-gradient(90deg, transparent, var(--old-silver), transparent);
   margin: 0 auto 50px auto;
-  box-shadow: 0 0 10px rgba(201, 169, 97, 0.5);
+  box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
 }
 
 .auth-card {
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(20px);
-  border: 2px solid rgba(201, 169, 97, 0.4);
+  border: 2px solid rgba(192, 192, 192, 0.4);
   border-radius: 20px;
   padding: 60px 50px;
   width: 100%;
@@ -379,14 +379,14 @@ body{
   position: relative;
   z-index: 1;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 
-              0 0 0 1px rgba(201, 169, 97, 0.2) inset;
+              0 0 0 1px rgba(192, 192, 192, 0.2) inset;
 }
 
 .auth-page-label {
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: var(--old-gold);
+  color: var(--old-silver);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   margin-bottom: 6px;
@@ -395,7 +395,7 @@ body{
 .auth-page-input {
   padding: 16px 18px;
   background: rgba(0, 0, 0, 0.6);
-  border: 1.5px solid rgba(201, 169, 97, 0.3);
+  border: 1.5px solid rgba(192, 192, 192, 0.3);
   border-radius: 10px;
   color: var(--cream);
   font-family: 'Inter', sans-serif;
@@ -411,8 +411,8 @@ body{
 
 .auth-page-input:focus {
   outline: none;
-  border-color: var(--old-gold);
-  box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+  border-color: var(--old-silver);
+  box-shadow: 0 0 0 3px rgba(192, 192, 192, 0.15);
   background: rgba(0, 0, 0, 0.7);
 }
 
@@ -423,8 +423,8 @@ body{
 .auth-page-submit-btn {
   margin-top: 24px;
   padding: 18px;
-  background: linear-gradient(135deg, var(--old-gold) 0%, var(--dark-gold) 100%);
-  border: 2px solid var(--old-gold);
+  background: linear-gradient(135deg, var(--old-silver) 0%, var(--dark-silver) 100%);
+  border: 2px solid var(--old-silver);
   border-radius: 50px;
   color: var(--darker-bg);
   font-family: 'Playfair Display', serif;
@@ -435,14 +435,14 @@ body{
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  box-shadow: 0 4px 20px rgba(201, 169, 97, 0.4);
+  box-shadow: 0 4px 20px rgba(192, 192, 192, 0.4);
 }
 
 .auth-page-submit-btn:hover {
-  background: linear-gradient(135deg, var(--light-gold) 0%, var(--old-gold) 100%);
-  border-color: var(--light-gold);
+  background: linear-gradient(135deg, var(--light-silver) 0%, var(--old-silver) 100%);
+  border-color: var(--light-silver);
   transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(201, 169, 97, 0.6);
+  box-shadow: 0 6px 30px rgba(192, 192, 192, 0.6);
 }
 
 .auth-page-submit-btn:active {
@@ -464,7 +464,7 @@ body{
 }
 
 .auth-switch-link {
-  color: var(--old-gold);
+  color: var(--old-silver);
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -472,7 +472,7 @@ body{
 }
 
 .auth-switch-link:hover {
-  color: var(--light-gold);
+  color: var(--light-silver);
 }
 
 .resend-btn {
@@ -499,7 +499,7 @@ body{
 
 .otp-info-text p:last-child {
   font-weight: 600;
-  color: var(--old-gold);
+  color: var(--old-silver);
 }
 
 @media (max-width: 600px) {
@@ -548,7 +548,7 @@ body{
   font-family: 'Playfair Display', serif;
   font-size: 14px;
   font-weight: 600;
-  color: var(--old-gold);
+  color: var(--old-silver);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -556,7 +556,7 @@ body{
 .form-input {
   padding: 14px 16px;
   background: var(--darker-bg);
-  border: 1.5px solid rgba(201, 169, 97, 0.3);
+  border: 1.5px solid rgba(192, 192, 192, 0.3);
   border-radius: 8px;
   color: var(--cream);
   font-family: 'Inter', sans-serif;
@@ -570,8 +570,8 @@ body{
 
 .form-input:focus {
   outline: none;
-  border-color: var(--old-gold);
-  box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+  border-color: var(--old-silver);
+  box-shadow: 0 0 0 3px rgba(192, 192, 192, 0.1);
 }
 
 .form-input.error {
@@ -589,7 +589,7 @@ body{
 .auth-submit-btn {
   margin-top: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, var(--old-gold) 0%, var(--dark-gold) 100%);
+  background: linear-gradient(135deg, var(--old-silver) 0%, var(--dark-silver) 100%);
   border: none;
   border-radius: 8px;
   color: var(--darker-bg);
@@ -600,13 +600,13 @@ body{
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.3);
 }
 
 .auth-submit-btn:hover {
-  background: linear-gradient(135deg, var(--light-gold) 0%, var(--old-gold) 100%);
+  background: linear-gradient(135deg, var(--light-silver) 0%, var(--old-silver) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
+  box-shadow: 0 6px 20px rgba(192, 192, 192, 0.4);
 }
 
 .auth-submit-btn:active {
@@ -645,13 +645,13 @@ body{
   justify-content: space-between;
   padding: 1.5rem 3rem;
   background: rgba(10, 10, 10, 0.8);
-  border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+  border-bottom: 1px solid rgba(192, 192, 192, 0.2);
 }
 
 .dashboard-header .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin: 0;
 }
 
@@ -665,8 +665,8 @@ body{
 .logout-btn, .back-link {
   padding: 0.5rem 1.5rem;
   background: transparent;
-  border: 1px solid var(--old-gold);
-  color: var(--old-gold);
+  border: 1px solid var(--old-silver);
+  color: var(--old-silver);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -675,7 +675,7 @@ body{
 }
 
 .logout-btn:hover, .back-link:hover {
-  background: var(--old-gold);
+  background: var(--old-silver);
   color: var(--darker-bg);
 }
 
@@ -687,7 +687,7 @@ body{
 
 .dashboard-title {
   font-size: 2.5rem;
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin-bottom: 0.5rem;
   text-align: center;
 }
@@ -708,7 +708,7 @@ body{
 
 .feature-card {
   background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
@@ -718,9 +718,9 @@ body{
 }
 
 .feature-card:hover {
-  border-color: var(--old-gold);
+  border-color: var(--old-silver);
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(201, 169, 97, 0.2);
+  box-shadow: 0 10px 30px rgba(192, 192, 192, 0.2);
 }
 
 .feature-icon {
@@ -729,7 +729,7 @@ body{
 }
 
 .feature-card h3 {
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin-bottom: 0.5rem;
   font-size: 1.3rem;
 }
@@ -749,13 +749,13 @@ body{
 
 .feature-container {
   background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   border-radius: 8px;
   padding: 2rem;
 }
 
 .feature-container h2 {
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin-bottom: 0.5rem;
   font-size: 2rem;
 }
@@ -779,7 +779,7 @@ body{
 }
 
 .form-label {
-  color: var(--old-gold);
+  color: var(--old-silver);
   font-weight: 500;
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -789,7 +789,7 @@ body{
 .form-input, .form-textarea {
   padding: 0.75rem;
   background: rgba(15, 15, 15, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   border-radius: 4px;
   color: var(--cream);
   font-family: inherit;
@@ -803,7 +803,7 @@ body{
 
 .form-input:focus, .form-textarea:focus {
   outline: none;
-  border-color: var(--old-gold);
+  border-color: var(--old-silver);
 }
 
 .file-input-wrapper {
@@ -814,7 +814,7 @@ body{
   display: inline-block;
   padding: 0.75rem 1.5rem;
   background: rgba(15, 15, 15, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   border-radius: 4px;
   color: var(--cream);
   cursor: pointer;
@@ -822,7 +822,7 @@ body{
 }
 
 .file-label:hover {
-  border-color: var(--old-gold);
+  border-color: var(--old-silver);
 }
 
 .file-input {
@@ -834,7 +834,7 @@ body{
 
 .feature-submit-btn {
   padding: 1rem 2rem;
-  background: var(--old-gold);
+  background: var(--old-silver);
   border: none;
   border-radius: 4px;
   color: var(--darker-bg);
@@ -847,9 +847,9 @@ body{
 }
 
 .feature-submit-btn:hover:not(:disabled) {
-  background: var(--light-gold);
+  background: var(--light-silver);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(201, 169, 97, 0.3);
+  box-shadow: 0 5px 15px rgba(192, 192, 192, 0.3);
 }
 
 .feature-submit-btn:disabled {
@@ -861,12 +861,12 @@ body{
   margin-top: 2rem;
   padding: 1.5rem;
   background: rgba(15, 15, 15, 0.6);
-  border: 1px solid rgba(201, 169, 97, 0.2);
+  border: 1px solid rgba(192, 192, 192, 0.2);
   border-radius: 8px;
 }
 
 .result-container h3 {
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin-bottom: 1rem;
 }
 
@@ -892,7 +892,7 @@ body{
   background: rgba(10, 10, 10, 0.8);
   padding: 1rem;
   border-radius: 4px;
-  border: 1px solid rgba(201, 169, 97, 0.2);
+  border: 1px solid rgba(192, 192, 192, 0.2);
   color: var(--cream);
   font-size: 0.9rem;
   line-height: 1.6;
@@ -915,7 +915,7 @@ body{
   flex-direction: column;
   height: 100%;
   background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -936,7 +936,7 @@ body{
 }
 
 .welcome-message h3 {
-  color: var(--old-gold);
+  color: var(--old-silver);
   margin-bottom: 0.5rem;
 }
 
@@ -949,15 +949,15 @@ body{
 
 .message-user {
   align-self: flex-end;
-  background: rgba(201, 169, 97, 0.2);
-  border: 1px solid var(--old-gold);
+  background: rgba(192, 192, 192, 0.2);
+  border: 1px solid var(--old-silver);
   color: var(--cream);
 }
 
 .message-assistant {
   align-self: flex-start;
   background: rgba(15, 15, 15, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   color: var(--cream);
 }
 
@@ -972,7 +972,7 @@ body{
   display: flex;
   padding: 1.5rem;
   gap: 1rem;
-  border-top: 1px solid rgba(201, 169, 97, 0.2);
+  border-top: 1px solid rgba(192, 192, 192, 0.2);
   background: rgba(15, 15, 15, 0.6);
 }
 
@@ -980,7 +980,7 @@ body{
   flex: 1;
   padding: 0.75rem;
   background: rgba(10, 10, 10, 0.8);
-  border: 1px solid rgba(201, 169, 97, 0.3);
+  border: 1px solid rgba(192, 192, 192, 0.3);
   border-radius: 4px;
   color: var(--cream);
   font-family: inherit;
@@ -989,12 +989,12 @@ body{
 
 .chat-input:focus {
   outline: none;
-  border-color: var(--old-gold);
+  border-color: var(--old-silver);
 }
 
 .send-btn {
   padding: 0.75rem 2rem;
-  background: var(--old-gold);
+  background: var(--old-silver);
   border: none;
   border-radius: 4px;
   color: var(--darker-bg);
@@ -1005,7 +1005,7 @@ body{
 }
 
 .send-btn:hover:not(:disabled) {
-  background: var(--light-gold);
+  background: var(--light-silver);
 }
 
 .send-btn:disabled {
