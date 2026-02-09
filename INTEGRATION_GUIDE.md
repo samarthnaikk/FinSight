@@ -102,8 +102,10 @@ Ensure all three services are running:
 2. **Models Server** (Port 8001)
    ```bash
    cd models
-   python -m uvicorn app:app --host 0.0.0.0 --port 8001
+   uvicorn app:app --host 0.0.0.0 --port 8001
    ```
+   
+   Note: The app.py file has port 8000 hardcoded. Use the uvicorn command above to override it.
 
 3. **Frontend Server** (Port 5173)
    ```bash
