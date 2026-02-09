@@ -1,13 +1,17 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function SignInPage() {
+  const navigate = useNavigate()
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
 
   const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -38,14 +42,27 @@ export default function SignInPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (validateForm()) {
-      console.log('Sign in form submitted:', {
-        email: formData.email
-      })
-      alert('Sign in successful! (Frontend only - no backend integration)')
+      setIsSubmitting(true)
+      setErrors({})
+
+      try {
+        await login({
+          email: formData.email,
+          password: formData.password,
+        })
+
+        // Navigate to dashboard on successful login
+        navigate('/dashboard')
+      } catch (error) {
+        console.error('Sign in error:', error)
+        setErrors({ general: error.message || 'Login failed. Please check your credentials.' })
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -61,6 +78,11 @@ export default function SignInPage() {
       <div className="auth-title-divider"></div>
 
       <div className="auth-card">
+        {errors.general && (
+          <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+            {errors.general}
+          </div>
+        )}
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email" className="auth-page-label">EMAIL ADDRESS</label>
@@ -90,8 +112,8 @@ export default function SignInPage() {
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
-          <button type="submit" className="auth-page-submit-btn">
-            SIGN IN
+          <button type="submit" className="auth-page-submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'SIGNING IN...' : 'SIGN IN'}
           </button>
         </form>
 
