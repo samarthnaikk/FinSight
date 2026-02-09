@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("DJANGO_SECRET_KEY")
+SECRET_KEY = config("DJANGO_SECRET_KEY", default="django-insecure-change-this-in-production")
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
-GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID")
-FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY")
+GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
+FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="default-insecure-encryption-key-change-this")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -158,10 +158,10 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
-        minutes=config("JWT_ACCESS_MINUTES", cast=int)
+        minutes=config("JWT_ACCESS_MINUTES", default=30, cast=int)
     ),
     "REFRESH_TOKEN_LIFETIME": timedelta(
-        days=config("JWT_REFRESH_DAYS", cast=int)
+        days=config("JWT_REFRESH_DAYS", default=7, cast=int)
     ),
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -174,8 +174,8 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-DEFAULT_FROM_EMAIL = f"FinSight AI <{config('EMAIL_HOST_USER')}>"
+DEFAULT_FROM_EMAIL = f"FinSight AI <{config('EMAIL_HOST_USER', default='noreply@finsight.local')}>"
 

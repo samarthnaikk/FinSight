@@ -23,6 +23,66 @@ services:
       retries: 5
     restart: unless-stopped
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: finsight-backend
+    environment:
+      # Django configuration
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-change-this-in-production}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      # Database configuration
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: ${POSTGRES_DB:-finsight_db}
+      DB_USER: ${POSTGRES_USER:-finsight_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-finsight_password}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      # Email configuration (optional)
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      # JWT configuration
+      JWT_ACCESS_MINUTES: ${JWT_ACCESS_MINUTES:-30}
+      JWT_REFRESH_DAYS: ${JWT_REFRESH_DAYS:-7}
+      # Google OAuth configuration (optional)
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      # Field encryption key
+      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-default-insecure-encryption-key-change-this}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  models:
+    build:
+      context: ./models
+      dockerfile: Dockerfile
+    container_name: finsight-models
+    environment:
+      # API Keys (optional)
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      BACKBOARD_API_KEY: ${BACKBOARD_API_KEY:-}
+      # CORS configuration
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8000}
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: finsight-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+      - models
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     driver: local
