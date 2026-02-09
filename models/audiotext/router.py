@@ -1,6 +1,7 @@
 import os
+import re
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from .service import AudioTranscriptionService
@@ -11,29 +12,42 @@ load_dotenv()
 # Initialize router
 router = APIRouter(prefix="/transcribe", tags=["transcription"])
 
-# Get API key from environment (will be checked when service is initialized)
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-# Transcription service will be initialized on first request
-transcription_service = None
-
-
-def get_transcription_service():
-    """Get or initialize the transcription service."""
-    global transcription_service
-    if transcription_service is None:
-        if not GROQ_API_KEY:
-            raise ValueError("GROQ_API_KEY not found in environment variables")
-        transcription_service = AudioTranscriptionService(api_key=GROQ_API_KEY)
-    return transcription_service
-
 # Directory to store transcriptions
 TRANSCRIPTIONS_DIR = Path(__file__).parent / "transcriptions"
 TRANSCRIPTIONS_DIR.mkdir(exist_ok=True)
 
 
+def get_transcription_service() -> AudioTranscriptionService:
+    """
+    Dependency injection for transcription service.
+    Creates a new service instance with API key from environment.
+    """
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="Server configuration error: GROQ_API_KEY not configured"
+        )
+    return AudioTranscriptionService(api_key=api_key)
+
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename to prevent path traversal attacks.
+    Removes directory separators and keeps only safe characters.
+    """
+    # Get just the filename without path
+    base_name = Path(filename).name
+    # Remove any characters that aren't alphanumeric, dash, underscore, or dot
+    sanitized = re.sub(r'[^a-zA-Z0-9._-]', '_', base_name)
+    return sanitized
+
+
 @router.post("")
-async def transcribe_audio(file: UploadFile = File(...)):
+async def transcribe_audio(
+    file: UploadFile = File(...),
+    service: AudioTranscriptionService = Depends(get_transcription_service)
+):
     """
     Transcribe audio file to text using Groq Whisper model.
     
@@ -51,18 +65,16 @@ async def transcribe_audio(file: UploadFile = File(...)):
         )
     
     try:
-        # Get transcription service
-        service = get_transcription_service()
-        
         # Transcribe audio
         transcription = service.transcribe_audio(
             audio_file=file.file,
             filename=file.filename
         )
         
-        # Generate output filename
+        # Generate output filename with sanitization
         base_name = Path(file.filename).stem
-        output_filename = f"{base_name}_transcription.txt"
+        safe_base_name = sanitize_filename(base_name)
+        output_filename = f"{safe_base_name}_transcription.txt"
         output_path = TRANSCRIPTIONS_DIR / output_filename
         
         # Save transcription to file
@@ -81,8 +93,15 @@ async def transcribe_audio(file: UploadFile = File(...)):
             }
         )
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
+        # Log the error server-side (in production, use proper logging)
+        import traceback
+        traceback.print_exc()
+        # Return generic error to client
         raise HTTPException(
             status_code=500,
-            detail=f"Error during transcription: {str(e)}"
+            detail="An error occurred during transcription. Please try again."
         )

@@ -23,8 +23,12 @@ class AudioTranscriptionService:
         Returns:
             Transcription text as returned by the model
         """
+        # Read file content and reset stream for potential retries
+        file_content = audio_file.read()
+        audio_file.seek(0)
+        
         transcription = self.client.audio.transcriptions.create(
-            file=(filename, audio_file.read()),
+            file=(filename, file_content),
             model=self.model,
             response_format="text"
         )
