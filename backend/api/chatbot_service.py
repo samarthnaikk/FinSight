@@ -15,8 +15,8 @@ class ChatbotService:
     def __init__(self):
         """Initialize the Backboard client."""
         self.backboard_api_key = config("BACKBOARD_API_KEY", default=None)
-        self.provider = "google"
-        self.model = "gemini-2.5-flash"
+        self.provider = "openai"
+        self.model = "gpt-5.2"
         
         if not self.backboard_api_key:
             raise ValueError("BACKBOARD_API_KEY not configured in environment")
