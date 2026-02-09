@@ -156,12 +156,12 @@ Please redact all PII from the following text:
         
         # Redact common name patterns (e.g., "my name is John Doe", "I'm Jane Smith")
         text = re.sub(r'\b(?:my name is|I\'?m|called|named)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b', 
-                     r'\1 [NAME_REDACTED]', text)
+                     r'my name is [NAME_REDACTED]', text)
         
         # Redact standalone capitalized names in common contexts
         # This is less aggressive to avoid false positives
         text = re.sub(r'\b(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b',
-                     r'\1 [NAME_REDACTED]', text)
+                     r'[NAME_REDACTED]', text)
         
         return text
     

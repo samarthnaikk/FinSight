@@ -200,7 +200,7 @@ async def get_processing_status():
             "process_file": "/filtertext/process-file - Process existing transcript file"
         },
         "pipeline": [
-            "1. PII Removal (Local Model: PII-Model-Phi3-Mini)",
+            "1. PII Removal (Local Model: Phi-3-mini)",
             "2. Structured Output Generation (Gemini-2.5-pro via Backboard)"
         ]
     }
