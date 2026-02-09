@@ -3,11 +3,6 @@
 
 FROM postgres:16-alpine
 
-# Set environment variables for PostgreSQL
-ENV POSTGRES_DB=finsight_db
-ENV POSTGRES_USER=finsight_user
-ENV POSTGRES_PASSWORD=finsight_password
-
 # Copy initialization script
 COPY init-db.sql /docker-entrypoint-initdb.d/
 
@@ -16,3 +11,4 @@ EXPOSE 5432
 
 # The official postgres image already handles initialization
 # Scripts in /docker-entrypoint-initdb.d/ are executed on first run
+# Database credentials are configured via environment variables in docker-compose.yml

@@ -9,11 +9,11 @@ FinSight has been migrated from SQLite to PostgreSQL for improved scalability, p
 ### 1. Start PostgreSQL Container
 
 ```bash
-# Start PostgreSQL using docker-compose
-docker-compose up -d
+# Start PostgreSQL using docker compose
+docker compose up -d
 
 # Verify the container is running
-docker-compose ps
+docker compose ps
 ```
 
 The PostgreSQL container will:
@@ -74,8 +74,8 @@ python manage.py runserver 8000
 ### Accessing the PostgreSQL Database
 
 ```bash
-# Using docker-compose
-docker-compose exec postgres psql -U finsight_user -d finsight_db
+# Using docker compose
+docker compose exec postgres psql -U finsight_user -d finsight_db
 
 # Or using psql directly (if installed)
 psql -h localhost -U finsight_user -d finsight_db
@@ -84,14 +84,14 @@ psql -h localhost -U finsight_user -d finsight_db
 ### Stopping PostgreSQL
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Stopping and Removing Data
 
 ```bash
 # This will delete all data in the database
-docker-compose down -v
+docker compose down -v
 ```
 
 ## Configuration Options
@@ -111,12 +111,12 @@ docker-compose down -v
 
 To use different database credentials:
 
-1. Update `docker-compose.yml` environment variables
+1. Update `docker compose.yml` environment variables
 2. Update `backend/.env` to match
 3. Restart the PostgreSQL container
 
 ```yaml
-# docker-compose.yml
+# docker compose.yml
 environment:
   POSTGRES_DB: my_custom_db
   POSTGRES_USER: my_user
@@ -136,8 +136,8 @@ DB_PASSWORD=my_password
 
 If you get "connection refused" errors:
 
-1. Ensure PostgreSQL container is running: `docker-compose ps`
-2. Check container logs: `docker-compose logs postgres`
+1. Ensure PostgreSQL container is running: `docker compose ps`
+2. Check container logs: `docker compose logs postgres`
 3. Verify port 5432 is not in use: `lsof -i :5432`
 
 ### Migration Errors
@@ -157,7 +157,7 @@ If you encounter permission errors:
 
 ```bash
 # Connect to the database
-docker-compose exec postgres psql -U finsight_user -d finsight_db
+docker compose exec postgres psql -U finsight_user -d finsight_db
 
 # Grant permissions
 GRANT ALL PRIVILEGES ON DATABASE finsight_db TO finsight_user;
@@ -169,7 +169,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO finsight_user;
 
 For production:
 
-1. **Change default credentials** in both `docker-compose.yml` and `.env`
+1. **Change default credentials** in both `docker compose.yml` and `.env`
 2. Use strong, randomly generated passwords
 3. Consider using environment-specific configuration
 4. Set `DJANGO_DEBUG=False`
@@ -198,7 +198,7 @@ The PostgreSQL container includes a healthcheck that ensures the database is rea
 
 ```bash
 # Check container health
-docker-compose ps
+docker compose ps
 ```
 
 The container will show as "healthy" when PostgreSQL is fully initialized and ready.
