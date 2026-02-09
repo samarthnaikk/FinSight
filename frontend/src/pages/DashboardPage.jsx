@@ -33,7 +33,7 @@ export default function DashboardPage() {
           </Link>
 
           <Link to="/transcribe" className="feature-card">
-            <div className="feature-icon">🎙</div>
+            <div className="feature-icon">MIC</div>
             <h3>Audio Transcription</h3>
             <p>Transcribe audio files to text using AI</p>
           </Link>
