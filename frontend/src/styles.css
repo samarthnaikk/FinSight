@@ -721,8 +721,8 @@ body{
 }
 
 .logout-btn:hover::before, .back-link:hover::before {
-  width: 300px;
-  height: 300px;
+  width: 150px;
+  height: 150px;
 }
 
 .logout-btn:hover, .back-link:hover {
@@ -877,6 +877,11 @@ body{
   opacity: 0;
   z-index: -1;
   transition: opacity 0.4s ease;
+  animation-play-state: paused;
+}
+
+.feature-card:hover::after {
+  opacity: 1;
   animation: borderGlow 3s linear infinite;
 }
 
@@ -922,10 +927,11 @@ body{
   color: var(--old-silver);
   font-family: 'Inter', sans-serif;
   letter-spacing: 1px;
+  will-change: transform;
 }
 
 .feature-card:hover .feature-icon {
-  transform: rotateY(360deg) scale(1.1);
+  transform: rotate3d(0, 1, 0, 360deg) scale(1.1);
   border-color: var(--old-silver);
   box-shadow: 0 0 30px rgba(192, 192, 192, 0.4);
   color: var(--cream);
