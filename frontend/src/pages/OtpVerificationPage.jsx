@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { backendAPI } from '../utils/api'
 
 export default function OtpVerificationPage() {
   const location = useLocation()
+  const navigate = useNavigate()
   const email = location.state?.email || ''
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const maskedEmail = email
     ? email.replace(/^(.{2})(.*)(@.*)$/, (_, start, middle, end) =>
@@ -13,7 +16,7 @@ export default function OtpVerificationPage() {
       )
     : '***************@gmail.com'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!otp.trim()) {
@@ -22,12 +25,32 @@ export default function OtpVerificationPage() {
     }
 
     setError('')
-    console.log('OTP verification submitted:', { otp })
-    alert('OTP verified successfully! (Frontend only - no backend integration)')
+    setIsSubmitting(true)
+
+    try {
+      await backendAPI.verifyOTP({
+        email: email,
+        otp: otp,
+      })
+
+      alert('OTP verified successfully! Please sign in.')
+      navigate('/signin')
+    } catch (error) {
+      console.error('OTP verification error:', error)
+      setError(error.message || 'OTP verification failed. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const handleResend = () => {
-    alert('OTP resent! (Frontend only - no backend integration)')
+  const handleResend = async () => {
+    try {
+      await backendAPI.sendOTP(email)
+      alert('OTP resent successfully!')
+    } catch (error) {
+      console.error('Resend OTP error:', error)
+      alert('Failed to resend OTP. Please try again.')
+    }
   }
 
   return (
@@ -68,8 +91,8 @@ export default function OtpVerificationPage() {
             You didn't receive OTP ? <button type="button" className="auth-switch-link resend-btn" onClick={handleResend}>RESEND CODE</button>
           </p>
 
-          <button type="submit" className="auth-page-submit-btn">
-            VERIFIED
+          <button type="submit" className="auth-page-submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'VERIFYING...' : 'VERIFIED'}
           </button>
         </form>
       </div>

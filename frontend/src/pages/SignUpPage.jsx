@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { backendAPI } from '../utils/api'
 
 export default function SignUpPage() {
   const navigate = useNavigate()
+  const { register } = useAuth()
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -12,6 +15,7 @@ export default function SignUpPage() {
   })
 
   const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -60,16 +64,37 @@ export default function SignUpPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (validateForm()) {
-      console.log('Sign up form submitted:', {
-        name: formData.name,
-        username: formData.username,
-        email: formData.email
-      })
-      navigate('/verify-otp', { state: { email: formData.email } })
+      setIsSubmitting(true)
+      setErrors({})
+
+      try {
+        // Register the user
+        await register({
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        })
+
+        // Send OTP
+        await backendAPI.sendOTP(formData.email)
+
+        // Navigate to OTP verification page
+        navigate('/verify-otp', { 
+          state: { 
+            email: formData.email
+          } 
+        })
+      } catch (error) {
+        console.error('Sign up error:', error)
+        setErrors({ general: error.message || 'Registration failed. Please try again.' })
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -85,6 +110,11 @@ export default function SignUpPage() {
       <div className="auth-title-divider"></div>
 
       <div className="auth-card">
+        {errors.general && (
+          <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+            {errors.general}
+          </div>
+        )}
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name" className="auth-page-label">NAME</label>
@@ -156,8 +186,8 @@ export default function SignUpPage() {
             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
           </div>
 
-          <button type="submit" className="auth-page-submit-btn">
-            SIGNUP
+          <button type="submit" className="auth-page-submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'SIGNING UP...' : 'SIGNUP'}
           </button>
         </form>
       </div>
