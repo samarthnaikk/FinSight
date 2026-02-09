@@ -1,9 +1,0 @@
-
-        Hello, my name is John Doe and my email is [EMAIL_REDACTED].
-        I can be reached at [PHONE_REDACTED]. My address is [ADDRESS_REDACTED], Springfield.
-        We discussed financial planning and investment strategies for 2024.
-        The key action items are:
-        1. Review portfolio allocation
-        2. Schedule follow-up meeting next month
-        3. Prepare quarterly report
-        
