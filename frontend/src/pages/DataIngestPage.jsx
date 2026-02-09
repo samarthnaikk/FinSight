@@ -29,9 +29,33 @@ export default function DataIngestPage() {
     setError('')
 
     try {
+      // Parse JSON strings to objects
+      let confidentialData = {}
+      let nonConfidentialData = {}
+      
+      if (confidential.trim()) {
+        try {
+          confidentialData = JSON.parse(confidential)
+        } catch (e) {
+          setError('Invalid JSON format for confidential data')
+          setIsLoading(false)
+          return
+        }
+      }
+      
+      if (nonConfidential.trim()) {
+        try {
+          nonConfidentialData = JSON.parse(nonConfidential)
+        } catch (e) {
+          setError('Invalid JSON format for non-confidential data')
+          setIsLoading(false)
+          return
+        }
+      }
+      
       const response = await backendAPI.ingestData({
-        confidential: confidential || '{}',
-        non_confidential: nonConfidential || '{}',
+        confidential: confidentialData,
+        non_confidential: nonConfidentialData,
       })
       setResult(response)
       setConfidential('')
