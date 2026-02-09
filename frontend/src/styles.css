@@ -100,24 +100,42 @@ body{
 }
 .hero-content {
   max-width: 1800px;
-  text-align: center;
-  margin-top: 80px;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 48px;
+}
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  margin-top: -200px;
 }
 .hero-title {
   font-family: 'Playfair Display', serif;
   font-weight: 800;
   font-size: 160px;
   color: #FFFFFF;
-  margin: 0 0 36px 0;
+  margin: 0;
   line-height: 1.05;
   letter-spacing: -2px;
+  white-space: nowrap;
 }
 .hero-title.larger {
-  font-size: 180px;
+  font-size: 140px;
   color: #FFFFFF;
+  white-space: nowrap;
 }
 .hero-tagline {
-  text-align: center;
+  text-align: left;
   margin-bottom: 48px;
 }
 .hero-tagline.larger p {
@@ -131,6 +149,7 @@ body{
   color: #d0d0d0;
   margin: 4px 0;
   line-height: 1.6;
+  text-align: left;
 }
 .demo-btn{
   padding:14px 32px;
@@ -179,7 +198,7 @@ body{
 .hero-buttons {
   display: flex;
   gap: 40px;
-  justify-content: center;
+  justify-content: flex-start;
   margin-top: 60px;
 }
 
