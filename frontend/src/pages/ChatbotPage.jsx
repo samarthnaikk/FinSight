@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 import { useAuth } from '../context/AuthContext'
 import { backendAPI } from '../utils/api'
 
@@ -106,7 +107,13 @@ export default function ChatbotPage() {
             
             {messages.map((msg, idx) => (
               <div key={idx} className={`message message-${msg.role} message-fade-in`}>
-                <div className="message-content">{msg.content}</div>
+                <div className="message-content">
+                  {msg.role === 'assistant' ? (
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  ) : (
+                    msg.content
+                  )}
+                </div>
               </div>
             ))}
             
