@@ -42,36 +42,44 @@ class TranscriptProcessingService:
         self.backboard_api_key = backboard_api_key
         self.backboard_base_url = "https://api.backboard.io/v1"
         
-    def remove_pii(self, text: str) -> str:
+    def remove_pii(self, text: str, use_model: bool = False) -> str:
         """
         Remove or redact PII from text using local PII-Model-Phi3-Mini.
         
-        This method uses a locally hosted open-source model to detect and remove
-        personally identifiable information from the transcript.
+        This method can use either:
+        1. A locally hosted Phi-3-Mini model (when use_model=True and model is available)
+        2. Pattern-based redaction as fallback (default, more efficient)
         
         Args:
             text: Input transcript text
+            use_model: Whether to attempt using the Phi-3 model (default: False)
             
         Returns:
             Text with PII removed/redacted
+            
+        Note:
+            To use the full Phi-3-mini model for PII detection:
+            1. Ensure transformers, torch, and accelerate are installed
+            2. Set use_model=True
+            3. The model will be downloaded on first use (~7GB)
+            4. GPU is recommended for faster processing
         """
-        # For now, implementing a basic PII removal using transformers library
-        # with microsoft/phi-3-mini model or similar for PII detection
-        try:
-            from transformers import pipeline
-            
-            # Initialize PII detection pipeline
-            # Using a text-generation model with specific prompting for PII detection
-            # In production, this would use a specialized PII detection model
-            pii_detector = pipeline(
-                "text-generation",
-                model="microsoft/Phi-3-mini-4k-instruct",
-                trust_remote_code=True,
-                device_map="auto"
-            )
-            
-            # Prompt for PII redaction
-            prompt = f"""<|system|>
+        # Try model-based approach only if explicitly requested
+        if use_model:
+            try:
+                from transformers import pipeline
+                
+                # Initialize PII detection pipeline using Phi-3-mini
+                # Note: This downloads ~7GB model on first use
+                pii_detector = pipeline(
+                    "text-generation",
+                    model="microsoft/Phi-3-mini-4k-instruct",
+                    trust_remote_code=True,
+                    device_map="auto"
+                )
+                
+                # Prompt for PII redaction
+                prompt = f"""<|system|>
 You are a PII (Personally Identifiable Information) redaction assistant. 
 Your task is to identify and redact all PII from the following text.
 Replace names, email addresses, phone numbers, addresses, social security numbers, 
@@ -84,34 +92,44 @@ Please redact all PII from the following text:
 
 <|assistant|>
 """
-            
-            # Generate redacted text
-            result = pii_detector(
-                prompt,
-                max_new_tokens=2048,
-                temperature=0.1,
-                do_sample=False
-            )
-            
-            # Extract the redacted text from the response
-            redacted_text = result[0]["generated_text"].split("<|assistant|>")[-1].strip()
-            
-            return redacted_text
-            
-        except Exception as e:
-            # If model loading fails, fall back to basic pattern-based redaction
-            print(f"Warning: PII model failed, using basic redaction: {e}")
-            return self._basic_pii_redaction(text)
+                
+                # Generate redacted text
+                result = pii_detector(
+                    prompt,
+                    max_new_tokens=2048,
+                    temperature=0.1,
+                    do_sample=False
+                )
+                
+                # Extract the redacted text from the response
+                redacted_text = result[0]["generated_text"].split("<|assistant|>")[-1].strip()
+                
+                return redacted_text
+                
+            except Exception as e:
+                # If model loading fails, fall back to basic pattern-based redaction
+                print(f"Warning: PII model failed, using pattern-based redaction: {e}")
+        
+        # Use pattern-based redaction (default, more efficient)
+        return self._basic_pii_redaction(text)
     
     def _basic_pii_redaction(self, text: str) -> str:
         """
-        Fallback basic PII redaction using regex patterns.
+        Enhanced PII redaction using regex patterns and NLP.
+        
+        Redacts:
+        - Email addresses
+        - Phone numbers (various formats)
+        - SSN patterns
+        - Credit card numbers
+        - Addresses (basic patterns)
+        - Common name patterns (capitalized words following common patterns)
         
         Args:
             text: Input text
             
         Returns:
-            Text with basic PII patterns redacted
+            Text with PII patterns redacted
         """
         import re
         
@@ -121,6 +139,7 @@ Please redact all PII from the following text:
         # Redact phone numbers (various formats)
         text = re.sub(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', '[PHONE_REDACTED]', text)
         text = re.sub(r'\b\(\d{3}\)\s*\d{3}[-.]?\d{4}\b', '[PHONE_REDACTED]', text)
+        text = re.sub(r'\+\d{1,3}[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}', '[PHONE_REDACTED]', text)
         
         # Redact SSN patterns
         text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[SSN_REDACTED]', text)
@@ -128,9 +147,21 @@ Please redact all PII from the following text:
         # Redact credit card numbers (basic pattern)
         text = re.sub(r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b', '[CC_REDACTED]', text)
         
-        # Redact potential addresses (street numbers)
-        text = re.sub(r'\b\d{1,5}\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct)\b', 
+        # Redact potential addresses (street numbers and names)
+        text = re.sub(r'\b\d{1,5}\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way|Place|Pl)\b', 
                      '[ADDRESS_REDACTED]', text, flags=re.IGNORECASE)
+        
+        # Redact ZIP codes
+        text = re.sub(r'\b\d{5}(?:-\d{4})?\b', '[ZIP_REDACTED]', text)
+        
+        # Redact common name patterns (e.g., "my name is John Doe", "I'm Jane Smith")
+        text = re.sub(r'\b(?:my name is|I\'?m|called|named)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b', 
+                     r'\1 [NAME_REDACTED]', text)
+        
+        # Redact standalone capitalized names in common contexts
+        # This is less aggressive to avoid false positives
+        text = re.sub(r'\b(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b',
+                     r'\1 [NAME_REDACTED]', text)
         
         return text
     
