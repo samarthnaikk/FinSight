@@ -2,20 +2,23 @@ import os
 import json
 import asyncio
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from pathlib import Path
+
 # Import the official SDK
 from backboard import BackboardClient
 
+# Conditional import for transformers to handle environments without it
 try:
-    from transformers import AutoTokenizer, AutoModelForTokenClassification
+    from transformers import pipeline
     import torch
     HAS_TRANSFORMERS = True
 except ImportError:
     HAS_TRANSFORMERS = False
 
+
 class TranscriptProcessingService:
-    """Service for processing transcripts using Backboard's persistent memory API."""
+    """Service for processing transcripts using Backboard's persistent memory API and local PII models."""
     
     STRUCTURED_OUTPUT_FORMAT = {
         "summary": "Brief summary of the transcript",
@@ -38,9 +41,8 @@ class TranscriptProcessingService:
         self.provider = "google"
         self.model = "gemini-2.5-pro"
         
-        # PII model attributes (lazy loading)
-        self._pii_tokenizer: Optional[Any] = None
-        self._pii_model: Optional[Any] = None
+        # PII model attributes
+        self._pii_pipeline: Optional[Any] = None
         self._pii_model_loaded = False
         self.pii_model_name = "ab-ai/PII-Model-Phi3-Mini"
         
@@ -82,14 +84,18 @@ Please provide your response as valid JSON matching the format above."""
             # Clean potential markdown backticks from LLM output
             if content.startswith("```json"):
                 content = content.replace("```json", "", 1).replace("```", "", 1).strip()
+            elif content.startswith("```"):
+                content = content.replace("```", "", 1).strip()
             
             return json.loads(content)
                 
         except Exception as e:
+            # Enhanced error logging
+            print(f"Backboard API Error: {str(e)}")
             raise RuntimeError(f"Backboard SDK Error: {str(e)}")
 
     def _load_pii_model(self):
-        """Lazy load the PII detection model."""
+        """Lazy load the PII detection model using the correct text-generation pipeline."""
         if self._pii_model_loaded:
             return
         
@@ -100,62 +106,68 @@ Please provide your response as valid JSON matching the format above."""
         
         try:
             print(f"Loading PII model: {self.pii_model_name}...")
-            self._pii_tokenizer = AutoTokenizer.from_pretrained(self.pii_model_name)
-            self._pii_model = AutoModelForTokenClassification.from_pretrained(self.pii_model_name)
-            self._pii_model.eval()
+            
+            # Optimization for Apple Silicon (M1/M2/M3) if available, otherwise CUDA or CPU
+            device_map = "auto"
+            torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+            
+            # CORRECTED: Use 'text-generation' pipeline for Causal LM (Phi-3)
+            # This fixes the "weights not initialized" error
+            self._pii_pipeline = pipeline(
+                "text-generation",
+                model=self.pii_model_name,
+                trust_remote_code=True,
+                device_map=device_map,
+                torch_dtype=torch_dtype
+            )
+            
             print("PII model loaded successfully.")
         except Exception as e:
             print(f"Warning: Failed to load PII model: {str(e)}. Falling back to regex-based PII detection.")
+            self._pii_pipeline = None
         
         self._pii_model_loaded = True
     
     def _remove_pii_with_model(self, text: str) -> str:
-        """Use the PII-Model-Phi3-Mini to detect and redact PII."""
+        """Use the PII-Model-Phi3-Mini to detect and redact PII via prompting."""
         self._load_pii_model()
         
-        if self._pii_model is None or self._pii_tokenizer is None:
-            # Model didn't load, return text unchanged to trigger fallback
+        if self._pii_pipeline is None:
             raise Exception("PII model not available")
         
         try:
-            # Tokenize the input text
-            inputs = self._pii_tokenizer(text, return_tensors="pt", truncation=True, max_length=512, padding=True)
+            # Construct the prompt format expected by Phi-3 Instruct models
+            # We explicitly ask it to output the REDACTED text, not just tags.
+            prompt = f"""<|system|>
+You are a PII (Personally Identifiable Information) redaction assistant. 
+Your task is to identify and redact all PII from the user's text.
+Replace names, email addresses, phone numbers, addresses, social security numbers, 
+and credit card numbers with [REDACTED]. Return ONLY the redacted text.
+<|end|>
+<|user|>
+{text}
+<|end|>
+<|assistant|>"""
             
-            # Get predictions
-            with torch.no_grad():
-                outputs = self._pii_model(**inputs)
+            # Generate response
+            # max_new_tokens should be roughly length of input + buffer
+            input_len = len(text.split())
+            max_tokens = min(2048, int(input_len * 1.5) + 100)
             
-            # Get predicted labels
-            predictions = torch.argmax(outputs.logits, dim=2)
-            tokens = self._pii_tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
-            labels = [self._pii_model.config.id2label[pred.item()] for pred in predictions[0]]
+            result = self._pii_pipeline(
+                prompt, 
+                max_new_tokens=max_tokens,
+                do_sample=False, # Deterministic output is better for redaction
+                temperature=0.0
+            )
             
-            # Reconstruct text with PII redacted
-            redacted_tokens = []
-            current_entity_type = None
-            
-            for token, label in zip(tokens, labels):
-                # Skip special tokens
-                if token in [self._pii_tokenizer.cls_token, self._pii_tokenizer.sep_token, 
-                            self._pii_tokenizer.pad_token, self._pii_tokenizer.unk_token]:
-                    continue
-                
-                # Check if token is a PII entity (B- or I- prefix indicates entity)
-                if label.startswith('B-') or label.startswith('I-'):
-                    entity_type = label.split('-')[1]
-                    if current_entity_type != entity_type:
-                        redacted_tokens.append(f'[{entity_type}_REDACTED]')
-                        current_entity_type = entity_type
-                else:
-                    current_entity_type = None
-                    # Clean up subword tokens (remove ## prefix from BERT-style tokenizers)
-                    clean_token = token.replace('##', '')
-                    redacted_tokens.append(clean_token)
-            
-            # Join tokens back into text
-            redacted_text = ' '.join(redacted_tokens)
-            # Clean up extra spaces
-            redacted_text = re.sub(r'\s+', ' ', redacted_text).strip()
+            # Extract the generated text after the prompt
+            generated_text = result[0]["generated_text"]
+            # Phi-3 output usually includes the prompt, so we split by the assistant tag
+            if "<|assistant|>" in generated_text:
+                redacted_text = generated_text.split("<|assistant|>")[-1].strip()
+            else:
+                redacted_text = generated_text.replace(prompt, "").strip()
             
             return redacted_text
             
@@ -164,9 +176,27 @@ Please provide your response as valid JSON matching the format above."""
             raise
     
     def _remove_pii_with_regex(self, text: str) -> str:
-        """Pattern-based PII redaction (fallback method)."""
+        """
+        Robust pattern-based PII redaction (fallback method).
+        Includes comprehensive patterns for financial data.
+        """
+        # Redact email addresses
         text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL_REDACTED]', text)
+        
+        # Redact phone numbers (various formats)
         text = re.sub(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', '[PHONE_REDACTED]', text)
+        text = re.sub(r'\b\(\d{3}\)\s*\d{3}[-.]?\d{4}\b', '[PHONE_REDACTED]', text)
+        
+        # Redact SSN patterns (US)
+        text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[SSN_REDACTED]', text)
+        
+        # Redact credit card numbers (basic pattern)
+        text = re.sub(r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b', '[CC_REDACTED]', text)
+        
+        # Redact potential addresses (Street/Ave/etc)
+        address_pattern = r'\b\d{1,5}\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct)\b'
+        text = re.sub(address_pattern, '[ADDRESS_REDACTED]', text, flags=re.IGNORECASE)
+        
         return text
     
     def remove_pii(self, text: str) -> str:
@@ -175,7 +205,7 @@ Please provide your response as valid JSON matching the format above."""
             # Try model-based PII detection first
             return self._remove_pii_with_model(text)
         except Exception as e:
-            print(f"Model-based PII detection failed, using regex fallback: {str(e)}")
+            print(f"Model-based PII detection failed, switching to regex fallback: {str(e)}")
             # Fallback to regex-based detection
             return self._remove_pii_with_regex(text)
 
@@ -185,8 +215,11 @@ Please provide your response as valid JSON matching the format above."""
         base_filename: str,
         output_dir: Path
     ) -> Dict[str, Any]:
-        """Complete async pipeline."""
-        # Step 1: Remove PII
+        """
+        Complete async pipeline: PII removal -> Structured output -> Save results.
+        """
+        # Step 1: Remove PII (Synchronous CPU/GPU operation)
+        # Note: In a heavy production app, you might want to run this in a thread pool
         pii_cleaned_text = self.remove_pii(transcript_text)
         
         # Save PII-cleaned text
@@ -194,7 +227,7 @@ Please provide your response as valid JSON matching the format above."""
         with open(pii_cleaned_path, 'w', encoding='utf-8') as f:
             f.write(pii_cleaned_text)
         
-        # Step 2: Generate structured output (awaiting the async call)
+        # Step 2: Generate structured output (awaiting the async IO call)
         structured_output = await self.generate_structured_output(pii_cleaned_text)
         
         # Step 3: Save structured output
