@@ -1,4 +1,5 @@
 import os
+import httpx  # Import httpx directly
 from groq import Groq
 from typing import BinaryIO
 
@@ -10,38 +11,34 @@ class AudioTranscriptionService:
         Initialize the transcription service.
         If api_key is not provided, it will look for GROQ_API_KEY in environment variables.
         """
-        # Ensure we capture the API key correctly
         self.api_key = api_key or os.environ.get("GROQ_API_KEY")
         if not self.api_key:
             raise ValueError("Groq API key is required")
             
-        self.client = Groq(api_key=self.api_key)
+        # FIX: Manually initialize http_client to bypass the 'proxies' argument bug
+        # found in older groq versions running with new httpx versions.
+        self.client = Groq(
+            api_key=self.api_key,
+            http_client=httpx.Client()
+        )
         self.model = "whisper-large-v3"
     
     def transcribe_audio(self, audio_file: BinaryIO, filename: str) -> str:
         """
         Transcribe audio file using Groq Whisper model.
-        
-        Args:
-            audio_file: Binary file object of the audio (file-like object)
-            filename: Name of the audio file (used to determine format)
-            
-        Returns:
-            The transcription text
         """
         try:
             # Ensure the file pointer is at the start
             audio_file.seek(0)
             
-            # Read the file content once
+            # Read file content
             file_content = audio_file.read()
             
             # API Call
-            # We pass the tuple (filename, file_content) to ensure Groq knows the file extension
             transcription = self.client.audio.transcriptions.create(
                 file=(filename, file_content),
                 model=self.model,
-                response_format="text" # Returns raw string
+                response_format="text"
             )
             
             return transcription
