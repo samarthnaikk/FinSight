@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { modelsAPI } from '../utils/api'
+import CopyButton from '../components/CopyButton'
+import JsonViewer from '../components/JsonViewer'
 
 export default function ProcessTextPage() {
   const { logout } = useAuth()
@@ -109,7 +111,11 @@ export default function ProcessTextPage() {
                 {result.data && (
                   <div>
                     <p><strong>Structured Data:</strong></p>
-                    <pre className="structured-data">{JSON.stringify(result.data, null, 2)}</pre>
+                    <JsonViewer data={result.data} />
+                    <CopyButton 
+                      textToCopy={JSON.stringify(result.data, null, 2)} 
+                      label="Copy Data" 
+                    />
                   </div>
                 )}
               </div>
