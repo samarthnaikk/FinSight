@@ -689,6 +689,12 @@ body{
   opacity: 0.3;
 }
 
+.dashboard-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .dashboard-header .logo {
   font-size: 1.8rem;
   font-weight: 700;
@@ -1540,5 +1546,73 @@ body{
 
   .send-btn {
     padding: 1rem 1.5rem;
+  }
+}
+
+/* Logo and Animation Styles */
+.finsight-logo {
+  filter: drop-shadow(0 2px 8px rgba(192, 192, 192, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.finsight-logo:hover {
+  transform: scale(1.05);
+}
+
+.drop-audio-animation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  opacity: 0.85;
+}
+
+/* Sound wave animation */
+.sound-wave-1 {
+  animation: soundPulse 1.5s ease-in-out infinite;
+}
+
+.sound-wave-2 {
+  animation: soundPulse 1.5s ease-in-out infinite 0.75s;
+}
+
+@keyframes soundPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* Drop arrow animation */
+.drop-arrow {
+  animation: dropBounce 2s ease-in-out infinite;
+}
+
+@keyframes dropBounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 0.6;
+  }
+}
+
+/* Microphone group subtle pulse */
+.microphone-group {
+  animation: micPulse 3s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
   }
 }

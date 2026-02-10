@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { modelsAPI } from '../utils/api'
 import CopyButton from '../components/CopyButton'
+import DropAudioAnimation from '../components/DropAudioAnimation'
 
 export default function TranscribePage() {
   const { logout } = useAuth()
@@ -69,6 +70,10 @@ export default function TranscribePage() {
           <p className="feature-description">
             Upload an audio file (.wav or .mp3) to transcribe it to text using AI
           </p>
+
+          {!selectedFile && !transcription && (
+            <DropAudioAnimation />
+          )}
 
           <form onSubmit={handleTranscribe} className="feature-form">
             <div className="file-input-wrapper">
