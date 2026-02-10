@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import FinSightLogo from '../components/FinSightLogo'
 
 export default function DashboardPage() {
   const { user, logout } = useAuth()
@@ -14,7 +15,10 @@ export default function DashboardPage() {
   return (
     <div className="app">
       <header className="dashboard-header">
-        <h1 className="logo">FinSight AI</h1>
+        <div className="dashboard-header-left">
+          <FinSightLogo width={40} height={40} />
+          <h1 className="logo">FinSight AI</h1>
+        </div>
         <div className="user-info">
           <span>Welcome, {user?.name || user?.username || 'User'}</span>
           <button onClick={handleLogout} className="logout-btn">Logout</button>

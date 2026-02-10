@@ -84,6 +84,17 @@ export const backendAPI = {
     return handleResponse(response);
   },
 
+  googleAuth: async (token) => {
+    const response = await fetch(`${BACKEND_URL}/api/auth/google/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+    return handleResponse(response);
+  },
+
   getMe: async () => {
     const token = getAuthToken();
     const response = await fetch(`${BACKEND_URL}/api/auth/me/`, {

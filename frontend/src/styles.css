@@ -448,6 +448,39 @@ body{
   transform: none;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  text-align: center;
+  color: rgba(245, 241, 232, 0.5);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(192, 192, 192, 0.2);
+}
+
+.auth-divider span {
+  padding: 0 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.google-signin-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.google-signin-container > div {
+  width: 100%;
+}
+
 .auth-switch-text {
   text-align: center;
   margin-top: 24px;
@@ -656,6 +689,12 @@ body{
   opacity: 0.3;
 }
 
+.dashboard-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .dashboard-header .logo {
   font-size: 1.8rem;
   font-weight: 700;
@@ -815,10 +854,19 @@ body{
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2.5rem;
   margin-top: 3rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
   perspective: 1000px;
+}
+
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature-card {
@@ -1122,6 +1170,50 @@ body{
   white-space: pre-wrap;
   word-wrap: break-word;
   margin-top: 0.5rem;
+}
+
+/* Copy Button Styles */
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(192, 192, 192, 0.1);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+  border-radius: 4px;
+  color: var(--old-silver);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.75rem;
+}
+
+.copy-button:hover {
+  background: rgba(192, 192, 192, 0.2);
+  border-color: var(--old-silver);
+  transform: translateY(-1px);
+}
+
+.copy-button:active {
+  transform: translateY(0);
+}
+
+.copy-button.copied {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.copy-button svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.copy-button span {
+  letter-spacing: 0.3px;
 }
 
 /* Chatbot Styles */
@@ -1455,4 +1547,186 @@ body{
   .send-btn {
     padding: 1rem 1.5rem;
   }
+}
+
+/* Logo and Animation Styles */
+.finsight-logo {
+  filter: drop-shadow(0 2px 8px rgba(192, 192, 192, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.finsight-logo:hover {
+  transform: scale(1.05);
+}
+
+.drop-audio-animation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  opacity: 0.85;
+}
+
+/* Sound wave animation */
+.sound-wave-1 {
+  animation: soundPulse 1.5s ease-in-out infinite;
+}
+
+.sound-wave-2 {
+  animation: soundPulse 1.5s ease-in-out infinite 0.75s;
+}
+
+@keyframes soundPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* Drop arrow animation */
+.drop-arrow {
+  animation: dropBounce 2s ease-in-out infinite;
+}
+
+@keyframes dropBounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 0.6;
+  }
+}
+
+/* Microphone group subtle pulse */
+.microphone-group {
+  animation: micPulse 3s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+/* JSON Viewer Styles */
+.json-viewer {
+  width: 100%;
+}
+
+.json-boxes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.json-property-box {
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(15, 15, 15, 0.95) 100%);
+  border: 1px solid rgba(192, 192, 192, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.json-property-box:hover {
+  border-color: rgba(192, 192, 192, 0.45);
+  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.1);
+  transform: translateY(-2px);
+}
+
+.json-box-header {
+  background: linear-gradient(90deg, rgba(137, 207, 240, 0.15) 0%, rgba(137, 207, 240, 0.05) 100%);
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(192, 192, 192, 0.2);
+}
+
+.json-box-key {
+  color: #89CFF0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.json-box-content {
+  padding: 1rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--cream);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.json-value {
+  display: inline;
+}
+
+.json-string {
+  color: #90EE90;
+}
+
+.json-number {
+  color: #FFB6C1;
+}
+
+.json-boolean {
+  color: #FFD700;
+  font-weight: 600;
+}
+
+.json-null {
+  color: #FF6B6B;
+  font-weight: 600;
+}
+
+.json-bracket {
+  color: #C0C0C0;
+  font-weight: 600;
+}
+
+.json-array-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.json-array-item {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 2px solid rgba(137, 207, 240, 0.5);
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.json-nested-object {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
+.json-nested-property {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.json-key {
+  color: #89CFF0;
+  font-weight: 500;
 }

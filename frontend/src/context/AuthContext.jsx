@@ -70,6 +70,29 @@ export const AuthProvider = ({ children }) => {
     return response;
   };
 
+  const googleLogin = async (credentialResponse) => {
+    const response = await backendAPI.googleAuth(credentialResponse.credential);
+    
+    if (response.success && response.data && response.data.access && response.data.refresh) {
+      const { access, refresh } = response.data;
+      
+      localStorage.setItem('accessToken', access);
+      localStorage.setItem('refreshToken', refresh);
+      setAccessToken(access);
+      setRefreshToken(refresh);
+      
+      // Fetch user data
+      const userResponse = await backendAPI.getMe();
+      if (userResponse.success && userResponse.data) {
+        setUser(userResponse.data);
+      }
+      
+      return response;
+    }
+    
+    throw new Error('Invalid response from Google authentication');
+  };
+
   const logout = async () => {
     try {
       if (refreshToken) {
@@ -93,6 +116,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    googleLogin,
     logout,
     isAuthenticated: !!user,
   };

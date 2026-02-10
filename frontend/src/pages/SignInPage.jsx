@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
 
 export default function SignInPage() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login, googleLogin } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -66,6 +67,20 @@ export default function SignInPage() {
     }
   }
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      await googleLogin(credentialResponse)
+      navigate('/dashboard')
+    } catch (error) {
+      console.error('Google sign-in error:', error)
+      setErrors({ general: error.message || 'Google sign-in failed. Please try again.' })
+    }
+  }
+
+  const handleGoogleError = () => {
+    setErrors({ general: 'Google sign-in failed. Please try again.' })
+  }
+
   return (
     <div className="auth-page">
       <div className="auth-page-nav">
@@ -116,6 +131,22 @@ export default function SignInPage() {
             {isSubmitting ? 'SIGNING IN...' : 'SIGN IN'}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <div className="google-signin-container">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            theme="filled_black"
+            size="large"
+            text="signin_with"
+            shape="rectangular"
+            width="100%"
+          />
+        </div>
 
         <p className="auth-switch-text">
           You don't have an account ? <Link to="/signup" className="auth-switch-link">SIGN UP</Link>
