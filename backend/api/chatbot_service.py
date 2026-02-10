@@ -17,6 +17,8 @@ class ChatbotService:
         self.backboard_api_key = config("BACKBOARD_API_KEY", default=None)
         self.provider = "openai"
         self.model = "gpt-5.2"
+        self._assistant = None
+        self._created_threads = {}  # Cache created thread IDs
         
         if not self.backboard_api_key:
             raise ValueError("BACKBOARD_API_KEY not configured in environment")
@@ -35,26 +37,12 @@ class ChatbotService:
         """
         return f"user_{user_id}_thread"
     
-    async def generate_response(
-        self, 
-        user_id: int,
-        message: str, 
-        conversation_history: List[Dict[str, str]]
-    ) -> str:
+    async def _get_or_create_assistant(self):
         """
-        Generate a response using Backboard.io with conversation history.
-        
-        Args:
-            user_id: The user's ID
-            message: The current user message
-            conversation_history: List of previous messages in format [{"role": "user/assistant", "content": "..."}]
-        
-        Returns:
-            The assistant's response
+        Get or create the assistant (cached to avoid recreation on each call).
         """
-        try:
-            # Create an assistant for financial conversations
-            assistant = await self.client.create_assistant(
+        if self._assistant is None:
+            self._assistant = await self.client.create_assistant(
                 name="FinSight AI Assistant",
                 system_prompt=(
                     "You are FinSight AI, a specialized financial intelligence engine designed for high-precision analysis of "
@@ -74,16 +62,45 @@ class ChatbotService:
                     "headers for scannability. Be concise but thorough."
                 )
             )
+        return self._assistant
+    
+    async def generate_response(
+        self, 
+        user_id: int,
+        message: str, 
+        conversation_history: List[Dict[str, str]]
+    ) -> str:
+        """
+        Generate a response using Backboard.io with conversation history.
+        
+        Args:
+            user_id: The user's ID
+            message: The current user message
+            conversation_history: List of previous messages in format [{"role": "user/assistant", "content": "..."}]
+        
+        Returns:
+            The assistant's response
+        """
+        try:
+            # Get or create cached assistant
+            assistant = await self._get_or_create_assistant()
             
             # Get or create thread ID
             thread_id = self.get_or_create_thread_id(user_id)
             
-            # Create or reuse thread
-            try:
-                thread = await self.client.get_thread(thread_id)
-            except Exception:
-                # Thread doesn't exist, create a new one
-                thread = await self.client.create_thread(assistant.assistant_id)
+            # Create or reuse thread with proper caching
+            if thread_id not in self._created_threads:
+                try:
+                    thread = await self.client.get_thread(thread_id)
+                    self._created_threads[thread_id] = thread.thread_id
+                except Exception:
+                    # Thread doesn't exist, create a new one with the user's thread_id
+                    thread = await self.client.create_thread(assistant.assistant_id)
+                    # Store the actual thread ID returned by Backboard
+                    self._created_threads[thread_id] = thread.thread_id
+            
+            # Use the cached thread ID
+            actual_thread_id = self._created_threads[thread_id]
             
             # Build context from conversation history
             context_messages = []
@@ -101,7 +118,7 @@ class ChatbotService:
             
             # Send message to Backboard
             response = await self.client.add_message(
-                thread_id=thread.thread_id,
+                thread_id=actual_thread_id,
                 content=full_message,
                 llm_provider=self.provider,
                 model_name=self.model,
@@ -121,24 +138,32 @@ class ChatbotService:
     ) -> str:
         """
         Synchronous wrapper for generate_response.
-        Uses asyncio.run() to execute the async function.
+        Uses proper event loop handling to avoid conflicts.
         """
-        # Use asyncio.run() which properly handles the event loop
-        import sys
-        if sys.version_info >= (3, 7):
-            return asyncio.run(
-                self.generate_response(user_id, message, conversation_history)
-            )
-        else:
-            # Fallback for older Python versions
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
+        try:
+            # Try to get the existing event loop
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # If loop is already running (e.g., in async context), 
+                # we cannot use loop.run_until_complete
+                # Create a new event loop in a thread instead
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(
+                        asyncio.run,
+                        self.generate_response(user_id, message, conversation_history)
+                    )
+                    return future.result()
+            else:
+                # No loop running, safe to use run_until_complete
                 return loop.run_until_complete(
                     self.generate_response(user_id, message, conversation_history)
                 )
-            finally:
-                loop.close()
+        except RuntimeError:
+            # No event loop exists, create a new one with asyncio.run()
+            return asyncio.run(
+                self.generate_response(user_id, message, conversation_history)
+            )
 
 
 # Singleton instance
