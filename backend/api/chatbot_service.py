@@ -3,6 +3,7 @@ Chatbot service for integrating with Backboard.io for stateful conversation.
 """
 import os
 import asyncio
+import concurrent.futures
 from typing import List, Dict, Any
 from decouple import config
 
@@ -18,7 +19,7 @@ class ChatbotService:
         self.provider = "openai"
         self.model = "gpt-5.2"
         self._assistant = None
-        self._created_threads = {}  # Cache created thread IDs
+        self._created_threads = {}  # Cache mapping of user thread IDs to Backboard thread IDs
         
         if not self.backboard_api_key:
             raise ValueError("BACKBOARD_API_KEY not configured in environment")
@@ -145,9 +146,7 @@ class ChatbotService:
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 # If loop is already running (e.g., in async context), 
-                # we cannot use loop.run_until_complete
-                # Create a new event loop in a thread instead
-                import concurrent.futures
+                # create a new event loop in a thread
                 with concurrent.futures.ThreadPoolExecutor() as executor:
                     future = executor.submit(
                         asyncio.run,
