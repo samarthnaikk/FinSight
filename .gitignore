@@ -17,6 +17,7 @@ dist/
 # Docker
 *.env
 .env*
+!.env.example
 
 # VS Code
 .vscode/
@@ -34,9 +35,19 @@ dist/
 coverage/
 *.coverage
 *.egg-info/
+test_output/
+
+# Ignore processed transcripts and outputs
+models/audiotext/transcriptions/
+models/filtertext/processed_outputs/
 
 # Ignore local settings
 local_settings.py
 
 # Ignore secrets
 secrets/
+
+# Database files
+*.db
+*.sqlite3
+postgres_data/
