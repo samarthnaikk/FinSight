@@ -448,6 +448,39 @@ body{
   transform: none;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  text-align: center;
+  color: rgba(245, 241, 232, 0.5);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(192, 192, 192, 0.2);
+}
+
+.auth-divider span {
+  padding: 0 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.google-signin-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.google-signin-container > div {
+  width: 100%;
+}
+
 .auth-switch-text {
   text-align: center;
   margin-top: 24px;
