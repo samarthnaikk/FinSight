@@ -1,59 +1,36 @@
 services:
-  # PostgreSQL Database Service
-  # This service provides the database for the Django backend
   postgres:
     build:
       context: .
       dockerfile: Dockerfile.postgres
     container_name: finsight-postgres
-    environment:
-      # These can be overridden by creating a .env file in the root directory
-      # For production, ALWAYS change these default values
-      POSTGRES_DB: ${POSTGRES_DB:-finsight_db}
-      POSTGRES_USER: ${POSTGRES_USER:-finsight_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finsight_password}
+    env_file:
+      - .env
     ports:
-      # Maps host port to container port 5432
-      # POSTGRES_PORT only affects the host-side port mapping
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finsight_user} -d ${POSTGRES_DB:-finsight_db}"]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
-  # Django Backend Service
-  # Depends on PostgreSQL being healthy before starting
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: finsight-backend
+    env_file:
+      - .env
     environment:
-      # Django configuration
-      # WARNING: Change secret key for production! This default is for development only.
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-change-this-in-production}
-      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
-      # Database configuration
       DB_ENGINE: django.db.backends.postgresql
-      DB_NAME: ${POSTGRES_DB:-finsight_db}
-      DB_USER: ${POSTGRES_USER:-finsight_user}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-finsight_password}
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_HOST: postgres
       DB_PORT: 5432
-      # Email configuration (optional)
-      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
-      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
-      # JWT configuration
-      JWT_ACCESS_MINUTES: ${JWT_ACCESS_MINUTES:-30}
-      JWT_REFRESH_DAYS: ${JWT_REFRESH_DAYS:-7}
-      # Google OAuth configuration (optional)
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      # Field encryption key
-      FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-rFGh6XAnqhNrIqUCQGz5obDcuIYLs7W5CfHOqZOpOwc=}
     ports:
       - "8000:8000"
     depends_on:
@@ -61,30 +38,24 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # FastAPI Models Service
-  # Provides ML/AI capabilities (audio transcription, text processing)
   models:
     build:
       context: ./models
       dockerfile: Dockerfile
     container_name: finsight-models
-    environment:
-      # API Keys (optional)
-      GROQ_API_KEY: ${GROQ_API_KEY:-}
-      BACKBOARD_API_KEY: ${BACKBOARD_API_KEY:-}
-      # CORS configuration
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:8000}
+    env_file:
+      - .env
     ports:
       - "8001:8001"
     restart: unless-stopped
 
-  # React Frontend Service
-  # Depends on backend and models services being available
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: finsight-frontend
+    env_file:
+      - .env
     ports:
       - "5173:5173"
     depends_on:
