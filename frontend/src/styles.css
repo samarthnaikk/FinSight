@@ -1616,3 +1616,117 @@ body{
     transform: scale(1.02);
   }
 }
+/* JSON Viewer Styles */
+.json-viewer {
+  width: 100%;
+}
+
+.json-boxes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.json-property-box {
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(15, 15, 15, 0.95) 100%);
+  border: 1px solid rgba(192, 192, 192, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.json-property-box:hover {
+  border-color: rgba(192, 192, 192, 0.45);
+  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.1);
+  transform: translateY(-2px);
+}
+
+.json-box-header {
+  background: linear-gradient(90deg, rgba(137, 207, 240, 0.15) 0%, rgba(137, 207, 240, 0.05) 100%);
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(192, 192, 192, 0.2);
+}
+
+.json-box-key {
+  color: #89CFF0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.json-box-content {
+  padding: 1rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--cream);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.json-value {
+  display: inline;
+}
+
+.json-string {
+  color: #90EE90;
+}
+
+.json-number {
+  color: #FFB6C1;
+}
+
+.json-boolean {
+  color: #FFD700;
+  font-weight: 600;
+}
+
+.json-null {
+  color: #FF6B6B;
+  font-weight: 600;
+}
+
+.json-bracket {
+  color: #C0C0C0;
+  font-weight: 600;
+}
+
+.json-array-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.json-array-item {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 2px solid rgba(137, 207, 240, 0.5);
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.json-nested-object {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
+.json-nested-property {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.json-key {
+  color: #89CFF0;
+  font-weight: 500;
+}
