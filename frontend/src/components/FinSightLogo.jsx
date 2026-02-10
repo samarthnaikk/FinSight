@@ -58,3 +58,6 @@ export default function FinSightLogo({ width = 40, height = 40 }) {
     </svg>
   )
 }
+
+
+//just a comment
