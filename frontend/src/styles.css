@@ -1157,6 +1157,50 @@ body{
   margin-top: 0.5rem;
 }
 
+/* Copy Button Styles */
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(192, 192, 192, 0.1);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+  border-radius: 4px;
+  color: var(--old-silver);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.75rem;
+}
+
+.copy-button:hover {
+  background: rgba(192, 192, 192, 0.2);
+  border-color: var(--old-silver);
+  transform: translateY(-1px);
+}
+
+.copy-button:active {
+  transform: translateY(0);
+}
+
+.copy-button.copied {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.copy-button svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.copy-button span {
+  letter-spacing: 0.3px;
+}
+
 /* Chatbot Styles */
 .chatbot-main {
   max-width: 1200px;

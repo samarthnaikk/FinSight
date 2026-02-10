@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { modelsAPI } from '../utils/api'
+import CopyButton from '../components/CopyButton'
 
 export default function ProcessTextPage() {
   const { logout } = useAuth()
@@ -110,6 +111,10 @@ export default function ProcessTextPage() {
                   <div>
                     <p><strong>Structured Data:</strong></p>
                     <pre className="structured-data">{JSON.stringify(result.data, null, 2)}</pre>
+                    <CopyButton 
+                      textToCopy={JSON.stringify(result.data, null, 2)} 
+                      label="Copy Data" 
+                    />
                   </div>
                 )}
               </div>
